@@ -70,7 +70,7 @@ const HirerJobPost = () => {
     };
 
     try {
-      const res = await fetch('http://localhost:5000/post-job', {
+      const res = await fetch('https://hirehubbackend-5.onrender.com/post-job', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
