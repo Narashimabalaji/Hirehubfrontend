@@ -18,6 +18,8 @@ import {
 } from '@mui/material';
 import { User, Lock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Register from './pages/Register';
+
 
 const Login = () => {
   const [Emailid, setEmail] = useState('');
