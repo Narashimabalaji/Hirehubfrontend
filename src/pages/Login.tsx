@@ -167,7 +167,7 @@ const Login = () => {
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 Don't have an account?{' '}
-                <Link href="#" variant="body2" sx={{ fontWeight: 'medium' }}>
+                <Link href="/register" variant="body2" sx={{ fontWeight: 'medium' }}>
                   Sign Up
                 </Link>
               </Typography>
