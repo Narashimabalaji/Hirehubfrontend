@@ -5,6 +5,7 @@ import AppLayout from './components/layout/AppLayout';
 import JobFeed from './pages/JobFeed';
 import ApplyJobPage from './components/ApplyJobPage';
 import HirerJobPost from './components/HirerJobPost';
+import Register from './pages/Register';
 
 const App = () => {
   return (
@@ -13,6 +14,8 @@ const App = () => {
         <Route path='/' element={<Login />} />
         <Route element={<AppLayout />}>
           <Route path='/home' element={<JobFeed />} />
+           <Route path='/register' element={<Register />} />
+          <Route path="/hirer/job-post" element={<HirerJobPost />} />
           <Route path="/hirer/job-post" element={<HirerJobPost />} />
 
           <Route path='/apply/:jobId' element={<ApplyJobPage />} />
