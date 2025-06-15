@@ -33,7 +33,7 @@ function ApplyJobPage() {
     const token = localStorage.getItem('access_token');
   
     try {
-      const res = await fetch(`http://localhost:5000/upload_resume/${jobId}`, {
+      const res = await fetch(`https://hirehubbackend-5.onrender.com/upload_resume/${jobId}`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${token}`
