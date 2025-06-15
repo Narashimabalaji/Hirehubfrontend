@@ -67,7 +67,7 @@ const NavaBot = () => {
         formData.append("question", question);
         formData.append("resume", resumeFile);
 
-        res = await fetch("http://localhost:5000/upload_resume_and_chat", {
+        res = await fetch("https://hirehubbackend-5.onrender.com/upload_resume_and_chat", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,
@@ -75,7 +75,7 @@ const NavaBot = () => {
           body: formData,
         });
       } else {
-        res = await fetch("http://localhost:5000/chat", {
+        res = await fetch("https://hirehubbackend-5.onrender.com/chat", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
