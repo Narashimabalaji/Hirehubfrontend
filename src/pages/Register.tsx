@@ -52,7 +52,7 @@ const Register = () => {
 
       if (response.ok) {
         setSuccess('Registration successful. You can now log in.');
-        setTimeout(() => navigate('/login'), 2000);
+        setTimeout(() => navigate('/'), 2000);
       } else {
         setError(data.message || 'Registration failed');
       }
