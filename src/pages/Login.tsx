@@ -67,7 +67,7 @@ const handleLogin = async (e: React.FormEvent) => {
         localStorage.setItem('userType', 'admin');
         localStorage.setItem('adminEmail', Emailid); // optional
       } else {
-        localStorage.setItem('userType', data.userType);
+        localStorage.setItem('userType', data.userType || 'user');
       }
 
       navigate('/home');
@@ -80,6 +80,8 @@ const handleLogin = async (e: React.FormEvent) => {
   }
 };
 
+
+  };
 
   return (
     <Container maxWidth="sm">
