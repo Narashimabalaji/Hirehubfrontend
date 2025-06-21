@@ -123,7 +123,7 @@ console.log("User type:", userType);
         <Button
           variant="outlined"
           color="secondary"
-          onClick={() => navigate('/admin/dashboard')}
+          onClick={() => navigate('/admin')}
         >
           Admin Dashboard
         </Button>
