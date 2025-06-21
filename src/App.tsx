@@ -6,6 +6,8 @@ import JobFeed from './pages/JobFeed';
 import ApplyJobPage from './components/ApplyJobPage';
 import HirerJobPost from './components/HirerJobPost';
 import Register from './pages/Register';
+import AdminDashboard from './pages/AdminDashboard'; 
+
 
 const App = () => {
   return (
@@ -17,7 +19,7 @@ const App = () => {
            <Route path='/register' element={<Register />} />
           <Route path="/hirer/job-post" element={<HirerJobPost />} />
           <Route path="/hirer/job-post" element={<HirerJobPost />} />
-
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path='/apply/:jobId' element={<ApplyJobPage />} />
           {/* More protected routes can go here */}
         </Route>
