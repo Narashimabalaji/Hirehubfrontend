@@ -102,12 +102,12 @@ useEffect(() => {
 }, []);
 console.log("User type:", userType);
 
-  return (
+ return (
   <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
     
-    {/* Hirer Only: Post Job Button */}
-    {userType === 'hirer' &&  (
-      <Box display="flex" justifyContent="flex-end" mb={3}>
+    {/* Hirer and Admin: Post Job Button */}
+    {(userType === 'hirer' || userType === 'admin') && (
+      <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button
           variant="contained"
           color="primary"
@@ -117,6 +117,25 @@ console.log("User type:", userType);
         </Button>
       </Box>
     )}
+
+    {/* Admin Only: Dashboard Button */}
+    {userType === 'admin' && (
+      <Box display="flex" justifyContent="flex-end" mb={2}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          onClick={() => navigate('/admin/dashboard')}
+        >
+          Admin Dashboard
+        </Button>
+      </Box>
+    )}
+
+    {/* Your other content here */}
+
+  </Paper>
+);
+
 
     {/* Filter Section */}
     <Box mb={4}>
