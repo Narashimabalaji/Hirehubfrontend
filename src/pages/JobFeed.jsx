@@ -102,11 +102,10 @@ useEffect(() => {
 }, []);
 console.log("User type:", userType);
 
- return (
+  return (
   <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
     
-    {/* Hirer and Admin: Post Job Button */}
-    {(userType === 'hirer' || userType === 'admin') && (
+      {(userType === 'hirer' || userType === 'admin') && (
       <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button
           variant="contained"
@@ -129,12 +128,7 @@ console.log("User type:", userType);
           Admin Dashboard
         </Button>
       </Box>
-    )}
-
-    {/* Your other content here */}
-
-  </Paper>
-);
+)}
 
 
     {/* Filter Section */}
