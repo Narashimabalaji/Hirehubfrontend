@@ -38,40 +38,48 @@ const Login = () => {
       setError('Please enter both email and password');
       return;
     }
-try {
-  // Hardcoded admin credentials
-  if (Emailid === 'admin@hirehub.com' && password === 'admin123') {
-    localStorage.setItem('access_token', 'admin-access-token');
-    localStorage.setItem('refresh_token', 'admin-refresh-token');
-    localStorage.setItem('userType', 'admin');
-    navigate('/home');
+const handleLogin = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setError('');
+
+  if (!Emailid || !password) {
+    setError('Please enter both email and password');
     return;
   }
 
-  const response = await fetch('https://hirehubbackend-5.onrender.com/login', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ Emailid, password })
-  });
+  try {
+    const response = await fetch('https://hirehubbackend-5.onrender.com/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ Emailid, password }),
+    });
 
-  const data = await response.json();
+    const data = await response.json();
 
-  if (response.ok) {
-    localStorage.setItem('access_token', data.access_token);
-    localStorage.setItem('refresh_token', data.refresh_token);
-    localStorage.setItem('userType', data.userType);
-    navigate('/home');
-  } else {
-    setError(data.message || 'Login failed');
+    if (response.ok) {
+      localStorage.setItem('access_token', data.access_token);
+      localStorage.setItem('refresh_token', data.refresh_token);
+
+      // Check for admin
+      if (Emailid === 'admin@hirehub.com' && password === 'admin123') {
+        localStorage.setItem('userType', 'admin');
+        localStorage.setItem('adminEmail', Emailid); // optional
+      } else {
+        localStorage.setItem('userType', data.userType);
+      }
+
+      navigate('/home');
+    } else {
+      setError(data.message || 'Login failed');
+    }
+  } catch (err) {
+    console.error(err);
+    setError('Something went wrong. Please try again.');
   }
-} catch (err) {
-  console.error(err);
-  setError('Something went wrong. Please try again.');
-}
+};
 
-  };
 
   return (
     <Container maxWidth="sm">
