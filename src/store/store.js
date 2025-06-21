@@ -12,7 +12,7 @@ const useStore = create((set, get) => ({
     set({ jobsLoading: true });
   
     const getAccessToken = () => localStorage.getItem('access_token');
-    const getRefreshToken = () => localStorage.getItem('refreshToken');
+    const getRefreshToken = () => localStorage.getItem('refresh_token');
     const setAccessToken = (token) => localStorage.setItem('access_token', token);
   
     const fetchWithToken = async (token) => {
