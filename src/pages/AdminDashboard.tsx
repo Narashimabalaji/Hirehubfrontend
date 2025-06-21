@@ -15,15 +15,22 @@ const AdminDashboard = () => {
   const [logs, setLogs] = useState([]);
   const [openLogModal, setOpenLogModal] = useState(false);
 
+  const accessToken = localStorage.getItem('access_token');
   const adminEmail = localStorage.getItem('adminEmail') || 'admin@hirehub.com';
 
   useEffect(() => {
-    fetchJobs();
+    if (!accessToken) {
+      window.location.href = '/login';
+    } else {
+      fetchJobs();
+    }
   }, [statusFilter]);
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`/admin/jobs?status=${statusFilter.toLowerCase()}`);
+      const res = await axios.get(`/admin/jobs?status=${statusFilter.toLowerCase()}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       setJobs(res.data);
     } catch (err) {
       console.error(err);
@@ -31,20 +38,36 @@ const AdminDashboard = () => {
   };
 
   const handleApprove = async (jobId) => {
-    await axios.post(`/approve-job/${jobId}`);
-    fetchJobs();
+    try {
+      await axios.post(`/approve-job/${jobId}`, {}, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      fetchJobs();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleReject = async () => {
-    await axios.post(`/reject_job/${selectedJob._id}`, { reason: rejectionComment });
-    setOpenModal(false);
-    setRejectionComment('');
-    fetchJobs();
+    try {
+      await axios.post(`/reject_job/${selectedJob._id}`, {
+        reason: rejectionComment,
+      }, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      setOpenModal(false);
+      setRejectionComment('');
+      fetchJobs();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleViewResumes = async (job) => {
     try {
-      const res = await axios.get(`/resumes/${job._id}`);
+      const res = await axios.get(`/resumes/${job._id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
       await logAction('Viewed', job);
@@ -62,6 +85,7 @@ const AdminDashboard = () => {
           jobId: selectedJob._id,
           jobTitle: selectedJob.title
         },
+        headers: { Authorization: `Bearer ${accessToken}` },
         responseType: 'blob'
       });
 
@@ -80,18 +104,26 @@ const AdminDashboard = () => {
   };
 
   const logAction = async (action, job) => {
-    await axios.post('/log', {
-      adminEmail,
-      jobId: job._id,
-      jobTitle: job.title,
-      action,
-      timestamp: new Date().toISOString(),
-    });
+    try {
+      await axios.post('/log', {
+        adminEmail,
+        jobId: job._id,
+        jobTitle: job.title,
+        action,
+        timestamp: new Date().toISOString(),
+      }, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const handleViewLogs = async (job) => {
     try {
-      const res = await axios.get(`/admin/logs?jobId=${job._id}`);
+      const res = await axios.get(`/admin/logs?jobId=${job._id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
       setLogs(res.data.logs || []);
       setSelectedJob(job);
       setOpenLogModal(true);
@@ -133,7 +165,7 @@ const AdminDashboard = () => {
         </Paper>
       ))}
 
-      {/* Rejection Reason Modal */}
+      {/* Rejection Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%' }}>
           <Typography variant="h6">Rejection Reason</Typography>
@@ -149,7 +181,7 @@ const AdminDashboard = () => {
         </Paper>
       </Modal>
 
-      {/* Resumes View Modal */}
+      {/* Resumes Modal */}
       <Modal open={!!resumes.length} onClose={() => { setResumes([]); setSelectedJob(null); }}>
         <Paper sx={{ width: 500, p: 4, mx: 'auto', mt: '10%' }}>
           <Typography variant="h6" gutterBottom>Resumes for {selectedJob?.title}</Typography>
@@ -164,7 +196,7 @@ const AdminDashboard = () => {
         </Paper>
       </Modal>
 
-      {/* Logs View Modal */}
+      {/* Logs Modal */}
       <Modal open={openLogModal} onClose={() => setOpenLogModal(false)}>
         <Paper sx={{ width: 600, p: 4, mx: 'auto', mt: '5%', maxHeight: '80vh', overflowY: 'auto' }}>
           <Typography variant="h6" gutterBottom>Logs for {selectedJob?.title}</Typography>
