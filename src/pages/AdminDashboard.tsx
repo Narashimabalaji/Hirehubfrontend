@@ -26,18 +26,19 @@ const AdminDashboard = () => {
     }
   };
 
-  useEffect(() => {
-    fetchJobs();
-  }, [statusFilter]);
+ useEffect(() => {
+  fetchJobs();
+}, [statusFilter]);
 
-  const fetchJobs = async () => {
-    try {
-      const res = await axios.get(`${BASE_URL}/admin/jobs?status=${statusFilter}`, authHeader);
-      setJobs(res.data);
-    } catch (err) {
-      console.error('Error fetching jobs:', err);
-    }
-  };
+const fetchJobs = async () => {
+  try {
+    const res = await axios.get(`${BASE_URL}/admin/jobs?status=${statusFilter}`, authHeader);
+    setJobs(res.data);
+  } catch (err) {
+    console.error('Error fetching jobs:', err);
+  }
+};
+
 
   const handleApprove = async (jobId: string) => {
     try {
