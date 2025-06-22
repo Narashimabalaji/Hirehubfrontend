@@ -3,14 +3,27 @@ import axios from 'axios';
 
 const API_BASE_URL = 'https://hirehubbackend-5.onrender.com';
 
+const modalStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: '10%',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  backgroundColor: '#fff',
+  padding: 20,
+  border: '1px solid #ccc',
+  borderRadius: 8,
+  zIndex: 1000,
+  width: 400,
+};
+
 const AdminDashboard = () => {
-  const [jobs, setJobs] = useState([]);
+  const [jobs, setJobs] = useState<any[]>([]);
   const [statusFilter, setStatusFilter] = useState('pending');
-  const [selectedJob, setSelectedJob] = useState(null);
+  const [selectedJob, setSelectedJob] = useState<any>(null);
   const [rejectionComment, setRejectionComment] = useState('');
   const [showRejectModal, setShowRejectModal] = useState(false);
-  const [resumes, setResumes] = useState([]);
-  const [logs, setLogs] = useState([]);
+  const [resumes, setResumes] = useState<any[]>([]);
+  const [logs, setLogs] = useState<any[]>([]);
   const [showLogModal, setShowLogModal] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -37,7 +50,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleApprove = async (jobId) => {
+  const handleApprove = async (jobId: string) => {
     try {
       await axios.post(`${API_BASE_URL}/approve-job/${jobId}`, {}, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -50,6 +63,7 @@ const AdminDashboard = () => {
   };
 
   const handleReject = async () => {
+    if (!selectedJob) return;
     try {
       await axios.post(`${API_BASE_URL}/reject_job/${selectedJob._id}`, {
         reason: rejectionComment,
@@ -65,7 +79,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleViewResumes = async (job) => {
+  const handleViewResumes = async (job: any) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/resumes/${job._id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -78,12 +92,12 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDownload = async (resume) => {
+  const handleDownload = async (resume: any) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/admin/download_resume`, {
         params: { url: resume.resume_url },
         headers: { Authorization: `Bearer ${accessToken}` },
-        responseType: 'blob'
+        responseType: 'blob',
       });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
@@ -98,7 +112,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const logAction = async (action, job) => {
+  const logAction = async (action: string, job: any) => {
     try {
       await axios.post(`${API_BASE_URL}/log`, {
         adminEmail,
@@ -114,7 +128,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleViewLogs = async (job) => {
+  const handleViewLogs = async (job: any) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/admin/logs`, {
         params: { jobId: job._id },
@@ -172,7 +186,7 @@ const AdminDashboard = () => {
         <div style={modalStyle}>
           <h3>Rejection Reason</h3>
           <textarea
-            rows="4"
+            rows={4}
             style={{ width: '100%', marginBottom: 10 }}
             value={rejectionComment}
             onChange={(e) => setRejectionComment(e.target.value)}
@@ -216,19 +230,5 @@ const AdminDashboard = () => {
     </div>
   );
 };
-
-const modalStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: '10%',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  backgroundColor: '#fff',
-  padding: 20,
-  border: '1px solid #ccc',
-  borderRadius: 8,
-  zIndex: 1000,
-  width: 400,
-};
-
 
 export default AdminDashboard;
