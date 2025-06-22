@@ -1,190 +1,174 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import {
-  Box, Typography, Button, Tabs, Tab, Paper, Modal,
-  TextField, List, ListItem, ListItemText, Divider
+  Box,
+  Container,
+  Typography,
+  TextField,
+  Button,
+  FormControlLabel,
+  Checkbox,
+  Link,
+  Tabs,
+  Tab,
+  Alert,
+  Paper
 } from '@mui/material';
-import axios from 'axios';
+import { User, Lock } from 'lucide-react';
+import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
-const AdminDashboard = () => {
-  const [jobs, setJobs] = useState([]);
-  const [statusFilter, setStatusFilter] = useState('pending');
-  const [selectedJob, setSelectedJob] = useState(null);
-  const [rejectionComment, setRejectionComment] = useState('');
-  const [openModal, setOpenModal] = useState(false);
-  const [resumes, setResumes] = useState([]);
-  const [logs, setLogs] = useState([]);
-  const [openLogModal, setOpenLogModal] = useState(false);
+const Login = () => {
+  const [Emailid, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
+  const [error, setError] = useState('');
 
-  const adminEmail = localStorage.getItem('adminEmail') || 'admin@hirehub.com';
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    fetchJobs();
-  }, [statusFilter]);
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setActiveTab(newValue);
+    setError('');
+  };
 
-  const fetchJobs = async () => {
-    try {
-      const res = await axios.get(`/admin/jobs?status=${statusFilter.toLowerCase()}`);
-      setJobs(res.data);
-    } catch (err) {
-      console.error(err);
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+
+    if (!Emailid || !password) {
+      setError('Please enter both email and password');
+      return;
     }
-  };
+try {
+  // Hardcoded admin credentials
+  if (Emailid === 'admin@hirehub.com' && password === 'admin123') {
+    localStorage.setItem('access_token', 'admin-access-token');
+    localStorage.setItem('refresh_token', 'admin-refresh-token');
+    localStorage.setItem('userType', 'admin');
+    navigate('/home');
+    return;
+  }
 
-  const handleApprove = async (jobId) => {
-    await axios.post(`/approve-job/${jobId}`);
-    fetchJobs();
-  };
+  const response = await fetch('https://hirehubbackend-5.onrender.com/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ Emailid, password })
+  });
 
-  const handleReject = async () => {
-    await axios.post(`/reject_job/${selectedJob._id}`, { reason: rejectionComment });
-    setOpenModal(false);
-    setRejectionComment('');
-    fetchJobs();
-  };
+  const data = await response.json();
 
-  const handleViewResumes = async (job) => {
-    try {
-      const res = await axios.get(`/resumes/${job._id}`);
-      setSelectedJob(job);
-      setResumes(res.data.resumes || []);
-      await logAction('Viewed', job);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  if (response.ok) {
+    localStorage.setItem('access_token', data.access_token);
+    localStorage.setItem('refresh_token', data.refresh_token);
+    localStorage.setItem('userType', data.userType);
+    navigate('/home');
+  } else {
+    setError(data.message || 'Login failed');
+  }
+} catch (err) {
+  console.error(err);
+  setError('Something went wrong. Please try again.');
+}
 
-  const handleDownload = async (resume) => {
-    try {
-      const res = await axios.get(`/admin/download_resume`, {
-        params: {
-          url: resume.resume_url,
-          adminEmail,
-          jobId: selectedJob._id,
-          jobTitle: selectedJob.title
-        },
-        responseType: 'blob'
-      });
-
-      const url = window.URL.createObjectURL(new Blob([res.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `resume-${resume.name}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-
-      await logAction('Downloaded', selectedJob);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const logAction = async (action, job) => {
-    await axios.post('/log', {
-      adminEmail,
-      jobId: job._id,
-      jobTitle: job.title,
-      action,
-      timestamp: new Date().toISOString(),
-    });
-  };
-
-  const handleViewLogs = async (job) => {
-    try {
-      const res = await axios.get(`/admin/logs?jobId=${job._id}`);
-      setLogs(res.data.logs || []);
-      setSelectedJob(job);
-      setOpenLogModal(true);
-    } catch (err) {
-      console.error(err);
-    }
   };
 
   return (
-    <Box p={4}>
-      <Typography variant="h4" mb={2}>Admin Dashboard</Typography>
+    <Container maxWidth="sm">
+      <Box sx={{ mt: 8 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
+            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
+              HireHub
+            </Typography>
+          </Box>
 
-      <Tabs value={statusFilter} onChange={(e, val) => setStatusFilter(val)}>
-        <Tab label="Pending" value="pending" />
-        <Tab label="Approved" value="approved" />
-        <Tab label="Rejected" value="rejected" />
-      </Tabs>
+          <Tabs
+            value={activeTab}
+            onChange={handleTabChange}
+            centered
+            sx={{ mb: 3 }}
+            indicatorColor="primary"
+            textColor="primary"
+          >
+            <Tab label="Job Seeker" />
+            <Tab label="Hiring Manager" />
+          </Tabs>
 
-      {jobs.map((job) => (
-        <Paper key={job._id} sx={{ p: 2, my: 2 }}>
-          <Typography variant="h6">{job.title}</Typography>
-          <Typography variant="body2" sx={{ mb: 1 }}>{job.description}</Typography>
-
-          {statusFilter === 'pending' && (
-            <Box mt={1}>
-              <Button onClick={() => handleApprove(job._id)} variant="contained" color="success" sx={{ mr: 2 }}>
-                Approve
-              </Button>
-              <Button onClick={() => { setSelectedJob(job); setOpenModal(true); }} variant="outlined" color="error">
-                Reject
-              </Button>
-            </Box>
+          {error && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {error}
+            </Alert>
           )}
 
-          <Box mt={2}>
-            <Button onClick={() => handleViewResumes(job)} sx={{ mr: 2 }}>View Resumes</Button>
-            <Button onClick={() => handleViewLogs(job)} color="secondary">View Logs</Button>
+          <Box component="form" onSubmit={handleLogin}>
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              id="Emailid"
+              label="Email Address"
+              name="Emailid"
+              autoComplete="email"
+              autoFocus
+              value={Emailid}
+              onChange={(e) => setEmail(e.target.value)}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: <User size={20} style={{ marginRight: 8, color: '#666' }} />
+              }}
+            />
+            <TextField
+              margin="normal"
+              required
+              fullWidth
+              name="password"
+              label="Password"
+              type="password"
+              id="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              sx={{ mb: 2 }}
+              InputProps={{
+                startAdornment: <Lock size={20} style={{ marginRight: 8, color: '#666' }} />
+              }}
+            />
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    value="remember"
+                    color="primary"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                  />
+                }
+                label="Remember me"
+              />
+              <Link href="#" variant="body2">
+                Forgot password?
+              </Link>
+            </Box>
+
+            <Button type="submit" fullWidth variant="contained" color="primary" sx={{ mb: 2, py: 1.5 }}>
+              Sign In
+            </Button>
+
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                Don't have an account?{' '}
+                <Link component={RouterLink} to="/register" variant="body2" sx={{ fontWeight: 'medium' }}>
+                  Sign Up
+                </Link>
+              </Typography>
+            </Box>
           </Box>
         </Paper>
-      ))}
-
-      {/* Rejection Reason Modal */}
-      <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%' }}>
-          <Typography variant="h6">Rejection Reason</Typography>
-          <TextField
-            fullWidth
-            multiline
-            rows={3}
-            value={rejectionComment}
-            onChange={(e) => setRejectionComment(e.target.value)}
-            sx={{ my: 2 }}
-          />
-          <Button variant="contained" onClick={handleReject}>Submit</Button>
-        </Paper>
-      </Modal>
-
-      {/* Resumes View Modal */}
-      <Modal open={!!resumes.length} onClose={() => { setResumes([]); setSelectedJob(null); }}>
-        <Paper sx={{ width: 500, p: 4, mx: 'auto', mt: '10%' }}>
-          <Typography variant="h6" gutterBottom>Resumes for {selectedJob?.title}</Typography>
-          <List>
-            {resumes.map((resume, index) => (
-              <ListItem key={index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ListItemText primary={resume.name} secondary={resume.email} />
-                <Button variant="outlined" onClick={() => handleDownload(resume)}>Download</Button>
-              </ListItem>
-            ))}
-          </List>
-        </Paper>
-      </Modal>
-
-      {/* Logs View Modal */}
-      <Modal open={openLogModal} onClose={() => setOpenLogModal(false)}>
-        <Paper sx={{ width: 600, p: 4, mx: 'auto', mt: '5%', maxHeight: '80vh', overflowY: 'auto' }}>
-          <Typography variant="h6" gutterBottom>Logs for {selectedJob?.title}</Typography>
-          <List>
-            {logs.map((log, index) => (
-              <React.Fragment key={index}>
-                <ListItem>
-                  <ListItemText
-                    primary={`${log.action} by ${log.adminEmail}`}
-                    secondary={new Date(log.timestamp).toLocaleString()}
-                  />
-                </ListItem>
-                <Divider />
-              </React.Fragment>
-            ))}
-          </List>
-        </Paper>
-      </Modal>
-    </Box>
+      </Box>
+    </Container>
   );
 };
 
-export default AdminDashboard;
+export default Login;
