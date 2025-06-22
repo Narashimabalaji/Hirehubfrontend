@@ -39,15 +39,6 @@ const Login = () => {
       return;
     }
 try {
-  // Hardcoded admin credentials
-  if (Emailid === 'admin@hirehub.com' && password === 'admin123') {
-    localStorage.setItem('access_token', 'admin-access-token');
-    localStorage.setItem('refresh_token', 'admin-refresh-token');
-    localStorage.setItem('userType', 'admin');
-    navigate('/home');
-    return;
-  }
-
   const response = await fetch('https://hirehubbackend-5.onrender.com/login', {
     method: 'POST',
     headers: {
@@ -61,7 +52,11 @@ try {
   if (response.ok) {
     localStorage.setItem('access_token', data.access_token);
     localStorage.setItem('refresh_token', data.refresh_token);
-    localStorage.setItem('userType', data.userType);
+
+    // ✅ Override userType to 'admin' for this specific email
+    const userType = Emailid === 'admin@hirehub.com' ? 'admin' : data.userType;
+    localStorage.setItem('userType', userType);
+
     navigate('/home');
   } else {
     setError(data.message || 'Login failed');
