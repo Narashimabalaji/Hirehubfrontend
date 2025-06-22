@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // 🔁 Change to your backend URL
+const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // ✅ Make sure this points to your backend
 
 const AdminDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -159,8 +159,12 @@ const AdminDashboard = () => {
           )}
 
           <Box mt={2}>
-            <Button onClick={() => handleViewResumes(job)} sx={{ mr: 2 }}>View Resumes</Button>
-            <Button onClick={() => handleViewLogs(job)} color="secondary">View Logs</Button>
+            <Button onClick={() => handleViewResumes(job)} sx={{ mr: 2 }}>
+              View Resumes
+            </Button>
+            <Button onClick={() => handleViewLogs(job)} color="secondary">
+              View Logs
+            </Button>
           </Box>
         </Paper>
       ))}
