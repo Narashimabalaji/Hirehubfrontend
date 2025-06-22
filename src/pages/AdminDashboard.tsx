@@ -5,6 +5,8 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
+const API_BASE_URL = 'https://hirehubbackend-5.onrender.com';
+
 const AdminDashboard = () => {
   const [jobs, setJobs] = useState([]);
   const [statusFilter, setStatusFilter] = useState('pending');
@@ -28,7 +30,8 @@ const AdminDashboard = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`/admin/jobs?status=${statusFilter.toLowerCase()}`, {
+      const res = await axios.get(`${API_BASE_URL}/admin/jobs`, {
+        params: { status: statusFilter.toLowerCase() },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setJobs(res.data);
@@ -39,7 +42,7 @@ const AdminDashboard = () => {
 
   const handleApprove = async (jobId) => {
     try {
-      await axios.post(`/approve-job/${jobId}`, {}, {
+      await axios.post(`${API_BASE_URL}/approve-job/${jobId}`, {}, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       fetchJobs();
@@ -50,7 +53,7 @@ const AdminDashboard = () => {
 
   const handleReject = async () => {
     try {
-      await axios.post(`/reject_job/${selectedJob._id}`, {
+      await axios.post(`${API_BASE_URL}/reject_job/${selectedJob._id}`, {
         reason: rejectionComment,
       }, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -65,7 +68,7 @@ const AdminDashboard = () => {
 
   const handleViewResumes = async (job) => {
     try {
-      const res = await axios.get(`/resumes/${job._id}`, {
+      const res = await axios.get(`${API_BASE_URL}/resumes/${job._id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setSelectedJob(job);
@@ -78,7 +81,7 @@ const AdminDashboard = () => {
 
   const handleDownload = async (resume) => {
     try {
-      const res = await axios.get(`/admin/download_resume`, {
+      const res = await axios.get(`${API_BASE_URL}/admin/download_resume`, {
         params: {
           url: resume.resume_url,
           adminEmail,
@@ -105,7 +108,7 @@ const AdminDashboard = () => {
 
   const logAction = async (action, job) => {
     try {
-      await axios.post('/log', {
+      await axios.post(`${API_BASE_URL}/log`, {
         adminEmail,
         jobId: job._id,
         jobTitle: job.title,
@@ -121,7 +124,8 @@ const AdminDashboard = () => {
 
   const handleViewLogs = async (job) => {
     try {
-      const res = await axios.get(`/admin/logs?jobId=${job._id}`, {
+      const res = await axios.get(`${API_BASE_URL}/admin/logs`, {
+        params: { jobId: job._id },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setLogs(res.data.logs || []);
