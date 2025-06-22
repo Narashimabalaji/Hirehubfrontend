@@ -217,7 +217,7 @@ const AdminDashboard = () => {
   );
 };
 
-const modalStyle = {
+const modalStyle: React.CSSProperties = {
   position: 'fixed',
   top: '10%',
   left: '50%',
@@ -229,5 +229,6 @@ const modalStyle = {
   zIndex: 1000,
   width: 400,
 };
+
 
 export default AdminDashboard;
