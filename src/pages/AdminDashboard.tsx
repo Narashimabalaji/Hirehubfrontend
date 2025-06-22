@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const BASE_URL = 'https://hirehubbackend-5.onrender.com';
+const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // 🔁 Change to your backend URL
 
 const AdminDashboard = () => {
   const [jobs, setJobs] = useState([]);
@@ -68,7 +68,7 @@ const AdminDashboard = () => {
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
 
-      // Log each resume view
+      // Log views
       for (const resume of res.data.resumes || []) {
         await axios.get(`${BASE_URL}/admin/view_resume`, {
           params: {
@@ -165,7 +165,7 @@ const AdminDashboard = () => {
         </Paper>
       ))}
 
-      {/* Rejection Reason Modal */}
+      {/* Rejection Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%' }}>
           <Typography variant="h6">Rejection Reason</Typography>
