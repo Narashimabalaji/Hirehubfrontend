@@ -11,7 +11,8 @@ import {
   Tabs,
   Tab,
   Alert,
-  Paper
+  Paper,
+  InputAdornment
 } from '@mui/material';
 import { User, Lock } from 'lucide-react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
@@ -53,12 +54,14 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('userType', data.userType || 'user');
 
-        // Admin check with same tokens, only userType changes
-        if (Emailid === 'admin@hirehub.com' && password === 'admin123') {
-          localStorage.setItem('userType', 'admin');
+        if (rememberMe) {
+          localStorage.setItem('rememberMe', 'true');
+          localStorage.setItem('savedEmail', Emailid);
         } else {
-          localStorage.setItem('userType', data.userType);
+          localStorage.removeItem('rememberMe');
+          localStorage.removeItem('savedEmail');
         }
 
         navigate('/home');
@@ -113,7 +116,11 @@ const Login = () => {
               onChange={(e) => setEmail(e.target.value)}
               sx={{ mb: 2 }}
               InputProps={{
-                startAdornment: <User size={20} style={{ marginRight: 8, color: '#666' }} />
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <User size={20} style={{ color: '#666' }} />
+                  </InputAdornment>
+                )
               }}
             />
             <TextField
@@ -129,7 +136,11 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               sx={{ mb: 2 }}
               InputProps={{
-                startAdornment: <Lock size={20} style={{ marginRight: 8, color: '#666' }} />
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <Lock size={20} style={{ color: '#666' }} />
+                  </InputAdornment>
+                )
               }}
             />
 
