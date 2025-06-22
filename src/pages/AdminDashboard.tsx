@@ -18,6 +18,13 @@ const AdminDashboard = () => {
   const [openLogModal, setOpenLogModal] = useState(false);
 
   const adminEmail = localStorage.getItem('adminEmail') || 'admin@hirehub.com';
+  const accessToken = localStorage.getItem('access_token');
+
+  const authHeader = {
+    headers: {
+      Authorization: `Bearer ${accessToken}`
+    }
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -25,7 +32,7 @@ const AdminDashboard = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/admin/jobs?status=${statusFilter}`);
+      const res = await axios.get(`${BASE_URL}/admin/jobs?status=${statusFilter}`, authHeader);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs:', err);
@@ -34,7 +41,7 @@ const AdminDashboard = () => {
 
   const handleApprove = async (jobId: string) => {
     try {
-      await axios.post(`${BASE_URL}/approve-job/${jobId}`);
+      await axios.post(`${BASE_URL}/approve-job/${jobId}`, {}, authHeader);
       fetchJobs();
     } catch (err) {
       console.error('Error approving job:', err);
@@ -46,7 +53,7 @@ const AdminDashboard = () => {
     try {
       await axios.post(`${BASE_URL}/reject_job/${selectedJob._id}`, {
         reason: rejectionComment,
-      });
+      }, authHeader);
       setOpenModal(false);
       setRejectionComment('');
       fetchJobs();
@@ -57,7 +64,7 @@ const AdminDashboard = () => {
 
   const handleViewResumes = async (job: any) => {
     try {
-      const res = await axios.get(`${BASE_URL}/resumes/${job._id}`);
+      const res = await axios.get(`${BASE_URL}/resumes/${job._id}`, authHeader);
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
       await logAction('view', job);
@@ -74,6 +81,9 @@ const AdminDashboard = () => {
           adminEmail,
           jobId: selectedJob._id,
           jobTitle: selectedJob.title
+        },
+        headers: {
+          Authorization: `Bearer ${accessToken}`
         },
         responseType: 'blob'
       });
@@ -100,7 +110,7 @@ const AdminDashboard = () => {
         jobTitle: job.title,
         action,
         timestamp: new Date().toISOString(),
-      });
+      }, authHeader);
     } catch (err) {
       console.error('Error logging action:', err);
     }
@@ -108,7 +118,7 @@ const AdminDashboard = () => {
 
   const handleViewLogs = async (job: any) => {
     try {
-      const res = await axios.get(`${BASE_URL}/admin/logs?jobId=${job._id}`);
+      const res = await axios.get(`${BASE_URL}/admin/logs?jobId=${job._id}`, authHeader);
       setLogs(res.data.logs || []);
       setSelectedJob(job);
       setOpenLogModal(true);
