@@ -3,7 +3,6 @@ import {
   Box, Typography, Button, Tabs, Tab, Paper, Modal,
   TextField, List, ListItem, ListItemText, Divider, InputAdornment
 } from '@mui/material';
-import SearchIcon from '@mui/icons-material/Search';
 import axios from 'axios';
 
 const AdminDashboard = () => {
@@ -66,7 +65,6 @@ const AdminDashboard = () => {
     setSelectedJob(job);
     setResumes(res.data.resumes || []);
 
-    // Log views
     for (const resume of res.data.resumes || []) {
       await axios.get('/admin/view_resume', {
         params: {
@@ -141,13 +139,6 @@ const AdminDashboard = () => {
         sx={{ mb: 3 }}
         value={search}
         onChange={(e) => setSearch(e.target.value)}
-        InputProps={{
-          startAdornment: (
-            <InputAdornment position="start">
-              <SearchIcon />
-            </InputAdornment>
-          ),
-        }}
       />
 
       {filteredJobs.map((job) => (
@@ -176,7 +167,6 @@ const AdminDashboard = () => {
         </Paper>
       ))}
 
-      {/* Rejection Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
         <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%' }}>
           <Typography variant="h6">Rejection Reason</Typography>
@@ -192,7 +182,6 @@ const AdminDashboard = () => {
         </Paper>
       </Modal>
 
-      {/* Resumes Modal */}
       <Modal open={!!resumes.length} onClose={() => { setResumes([]); setSelectedJob(null); }}>
         <Paper sx={{ width: 600, p: 4, mx: 'auto', mt: '5%' }}>
           <Typography variant="h6" gutterBottom>Resumes for {selectedJob?.title}</Typography>
@@ -214,7 +203,6 @@ const AdminDashboard = () => {
         </Paper>
       </Modal>
 
-      {/* Logs Modal */}
       <Modal open={openLogModal} onClose={() => setOpenLogModal(false)}>
         <Paper sx={{ width: 600, p: 4, mx: 'auto', mt: '5%', maxHeight: '80vh', overflowY: 'auto' }}>
           <Typography variant="h6" gutterBottom>Logs for {selectedJob?.title}</Typography>
