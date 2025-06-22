@@ -26,19 +26,18 @@ const AdminDashboard = () => {
     }
   };
 
- useEffect(() => {
-  fetchJobs();
-}, [statusFilter]);
+  useEffect(() => {
+    fetchJobs();
+  }, [statusFilter]);
 
-const fetchJobs = async () => {
-  try {
-    const res = await axios.get(`${BASE_URL}/admin/jobs?status=${statusFilter}`, authHeader);
-    setJobs(res.data);
-  } catch (err) {
-    console.error('Error fetching jobs:', err);
-  }
-};
-
+  const fetchJobs = async () => {
+    try {
+      const res = await axios.get(`${BASE_URL}/admin/jobs?status=${statusFilter}`, authHeader);
+      setJobs(res.data);
+    } catch (err) {
+      console.error('Error fetching jobs:', err);
+    }
+  };
 
   const handleApprove = async (jobId: string) => {
     try {
@@ -68,7 +67,19 @@ const fetchJobs = async () => {
       const res = await axios.get(`${BASE_URL}/resumes/${job._id}`, authHeader);
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
-      await logAction('view', job);
+
+      // Log each resume view
+      for (const resume of res.data.resumes || []) {
+        await axios.get(`${BASE_URL}/admin/view_resume`, {
+          params: {
+            url: resume.resume_url,
+            adminEmail,
+            jobId: job._id,
+            jobTitle: job.title
+          },
+          ...authHeader
+        });
+      }
     } catch (err) {
       console.error('Error viewing resumes:', err);
     }
@@ -96,24 +107,8 @@ const fetchJobs = async () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
-
-      await logAction('download', selectedJob);
     } catch (err) {
       console.error('Error downloading resume:', err);
-    }
-  };
-
-  const logAction = async (action: string, job: any) => {
-    try {
-      await axios.post(`${BASE_URL}/log`, {
-        adminEmail,
-        jobId: job._id,
-        jobTitle: job.title,
-        action,
-        timestamp: new Date().toISOString(),
-      }, authHeader);
-    } catch (err) {
-      console.error('Error logging action:', err);
     }
   };
 
