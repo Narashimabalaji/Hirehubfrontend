@@ -1,31 +1,24 @@
 import React, { useEffect, useState } from 'react';
+import {
+  Box, Typography, Button, Tabs, Tab, Paper, Modal,
+  TextField, List, ListItem, ListItemText, Divider, AppBar, Toolbar,
+  IconButton, Tooltip, Snackbar, Alert
+} from '@mui/material';
+import { Visibility, Download, Logout, History } from '@mui/icons-material';
 import axios from 'axios';
 
 const API_BASE_URL = 'https://hirehubbackend-5.onrender.com';
 
-const modalStyle: React.CSSProperties = {
-  position: 'fixed',
-  top: '10%',
-  left: '50%',
-  transform: 'translateX(-50%)',
-  backgroundColor: '#fff',
-  padding: 20,
-  border: '1px solid #ccc',
-  borderRadius: 8,
-  zIndex: 1000,
-  width: 400,
-};
-
 const AdminDashboard = () => {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState([]);
   const [statusFilter, setStatusFilter] = useState('pending');
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [selectedJob, setSelectedJob] = useState(null);
   const [rejectionComment, setRejectionComment] = useState('');
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [resumes, setResumes] = useState<any[]>([]);
-  const [logs, setLogs] = useState<any[]>([]);
-  const [showLogModal, setShowLogModal] = useState(false);
-  const [message, setMessage] = useState('');
+  const [openModal, setOpenModal] = useState(false);
+  const [resumes, setResumes] = useState([]);
+  const [logs, setLogs] = useState([]);
+  const [openLogModal, setOpenLogModal] = useState(false);
+  const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
 
   const accessToken = localStorage.getItem('access_token');
   const adminEmail = localStorage.getItem('adminEmail') || 'admin@hirehub.com';
@@ -41,7 +34,7 @@ const AdminDashboard = () => {
   const fetchJobs = async () => {
     try {
       const res = await axios.get(`${API_BASE_URL}/admin/jobs`, {
-        params: { status: statusFilter },
+        params: { status: statusFilter.toLowerCase() },
         headers: { Authorization: `Bearer ${accessToken}` },
       });
       setJobs(res.data);
@@ -50,12 +43,12 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleApprove = async (jobId: string) => {
+  const handleApprove = async (jobId) => {
     try {
       await axios.post(`${API_BASE_URL}/approve-job/${jobId}`, {}, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setMessage('Job approved successfully.');
+      setSnackbar({ open: true, message: 'Job approved successfully.', severity: 'success' });
       fetchJobs();
     } catch (err) {
       console.error(err);
@@ -63,15 +56,14 @@ const AdminDashboard = () => {
   };
 
   const handleReject = async () => {
-    if (!selectedJob) return;
     try {
       await axios.post(`${API_BASE_URL}/reject_job/${selectedJob._id}`, {
         reason: rejectionComment,
       }, {
         headers: { Authorization: `Bearer ${accessToken}` },
       });
-      setMessage('Job rejected successfully.');
-      setShowRejectModal(false);
+      setSnackbar({ open: true, message: 'Job rejected successfully.', severity: 'info' });
+      setOpenModal(false);
       setRejectionComment('');
       fetchJobs();
     } catch (err) {
@@ -79,7 +71,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleViewResumes = async (job: any) => {
+  const handleViewResumes = async (job) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/resumes/${job._id}`, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -92,13 +84,14 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDownload = async (resume: any) => {
+  const handleDownload = async (resume) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/admin/download_resume`, {
         params: { url: resume.resume_url },
         headers: { Authorization: `Bearer ${accessToken}` },
-        responseType: 'blob',
+        responseType: 'blob'
       });
+
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement('a');
       link.href = url;
@@ -106,13 +99,14 @@ const AdminDashboard = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
+
       await logAction('Downloaded Resume', selectedJob);
     } catch (err) {
       console.error(err);
     }
   };
 
-  const logAction = async (action: string, job: any) => {
+  const logAction = async (action, job) => {
     try {
       await axios.post(`${API_BASE_URL}/log`, {
         adminEmail,
@@ -128,7 +122,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleViewLogs = async (job: any) => {
+  const handleViewLogs = async (job) => {
     try {
       const res = await axios.get(`${API_BASE_URL}/admin/logs`, {
         params: { jobId: job._id },
@@ -136,7 +130,7 @@ const AdminDashboard = () => {
       });
       setLogs(res.data.logs || []);
       setSelectedJob(job);
-      setShowLogModal(true);
+      setOpenLogModal(true);
     } catch (err) {
       console.error(err);
     }
@@ -148,86 +142,105 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div style={{ padding: 20 }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 30 }}>
-        <h2>HireHub Admin Dashboard</h2>
-        <button onClick={logout} style={{ padding: '6px 12px' }}>Logout</button>
-      </header>
+    <Box>
+      <AppBar position="static">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>HireHub Admin Dashboard</Typography>
+          <Tooltip title="Logout">
+            <IconButton color="inherit" onClick={logout}>
+              <Logout />
+            </IconButton>
+          </Tooltip>
+        </Toolbar>
+      </AppBar>
 
-      <div style={{ marginBottom: 20 }}>
-        <button onClick={() => setStatusFilter('pending')}>Pending</button>
-        <button onClick={() => setStatusFilter('approved')} style={{ marginLeft: 10 }}>Approved</button>
-        <button onClick={() => setStatusFilter('rejected')} style={{ marginLeft: 10 }}>Rejected</button>
-      </div>
+      <Box p={4}>
+        <Tabs value={statusFilter} onChange={(e, val) => setStatusFilter(val)}>
+          <Tab label="Pending" value="pending" />
+          <Tab label="Approved" value="approved" />
+          <Tab label="Rejected" value="rejected" />
+        </Tabs>
 
-      {message && <div style={{ background: '#def', padding: 10, marginBottom: 10 }}>{message}</div>}
+        {jobs.map((job) => (
+          <Paper key={job._id} sx={{ p: 3, my: 2, borderRadius: 3, boxShadow: 3 }}>
+            <Typography variant="h6" color="primary.main">{job.title}</Typography>
+            <Typography variant="body2" sx={{ mb: 1 }}>{job.description}</Typography>
 
-      {jobs.map((job) => (
-        <div key={job._id} style={{ border: '1px solid #ccc', padding: 20, marginBottom: 15, borderRadius: 5 }}>
-          <h3>{job.title}</h3>
-          <p>{job.description}</p>
+            {statusFilter === 'pending' && (
+              <Box mt={2}>
+                <Button variant="contained" color="success" sx={{ mr: 2 }} onClick={() => handleApprove(job._id)}>Approve</Button>
+                <Button variant="outlined" color="error" onClick={() => { setSelectedJob(job); setOpenModal(true); }}>Reject</Button>
+              </Box>
+            )}
 
-          {statusFilter === 'pending' && (
-            <div style={{ marginTop: 10 }}>
-              <button onClick={() => handleApprove(job._id)} style={{ marginRight: 10 }}>Approve</button>
-              <button onClick={() => { setSelectedJob(job); setShowRejectModal(true); }}>Reject</button>
-            </div>
-          )}
-
-          <div style={{ marginTop: 10 }}>
-            <button onClick={() => handleViewResumes(job)} style={{ marginRight: 10 }}>View Resumes</button>
-            <button onClick={() => handleViewLogs(job)}>View Logs</button>
-          </div>
-        </div>
-      ))}
+            <Box mt={2}>
+              <Button startIcon={<Visibility />} onClick={() => handleViewResumes(job)} sx={{ mr: 2 }}>View Resumes</Button>
+              <Button startIcon={<History />} onClick={() => handleViewLogs(job)} color="secondary">View Logs</Button>
+            </Box>
+          </Paper>
+        ))}
+      </Box>
 
       {/* Rejection Modal */}
-      {showRejectModal && (
-        <div style={modalStyle}>
-          <h3>Rejection Reason</h3>
-          <textarea
-            rows={4}
-            style={{ width: '100%', marginBottom: 10 }}
+      <Modal open={openModal} onClose={() => setOpenModal(false)}>
+        <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%', borderRadius: 3 }}>
+          <Typography variant="h6" gutterBottom>Rejection Reason</Typography>
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
             value={rejectionComment}
             onChange={(e) => setRejectionComment(e.target.value)}
-            placeholder="Enter reason..."
+            sx={{ mb: 2 }}
+            placeholder="Enter reason for rejection..."
           />
-          <button onClick={handleReject}>Submit</button>
-          <button onClick={() => setShowRejectModal(false)} style={{ marginLeft: 10 }}>Cancel</button>
-        </div>
-      )}
+          <Button variant="contained" color="error" onClick={handleReject}>Submit</Button>
+        </Paper>
+      </Modal>
 
       {/* Resumes Modal */}
-      {resumes.length > 0 && (
-        <div style={modalStyle}>
-          <h3>Resumes for {selectedJob?.title}</h3>
-          <ul>
+      <Modal open={!!resumes.length} onClose={() => { setResumes([]); setSelectedJob(null); }}>
+        <Paper sx={{ width: 500, p: 4, mx: 'auto', mt: '10%', borderRadius: 3 }}>
+          <Typography variant="h6" gutterBottom>Resumes for {selectedJob?.title}</Typography>
+          <List>
             {resumes.map((resume, index) => (
-              <li key={index} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <span>{resume.name} ({resume.email})</span>
-                <button onClick={() => handleDownload(resume)}>Download</button>
-              </li>
+              <ListItem key={index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <ListItemText primary={resume.name} secondary={resume.email} />
+                <IconButton onClick={() => handleDownload(resume)}><Download /></IconButton>
+              </ListItem>
             ))}
-          </ul>
-          <button onClick={() => setResumes([])}>Close</button>
-        </div>
-      )}
+          </List>
+        </Paper>
+      </Modal>
 
       {/* Logs Modal */}
-      {showLogModal && (
-        <div style={modalStyle}>
-          <h3>Logs for {selectedJob?.title}</h3>
-          <ul>
+      <Modal open={openLogModal} onClose={() => setOpenLogModal(false)}>
+        <Paper sx={{ width: 600, p: 4, mx: 'auto', mt: '5%', maxHeight: '80vh', overflowY: 'auto', borderRadius: 3 }}>
+          <Typography variant="h6" gutterBottom>Logs for {selectedJob?.title}</Typography>
+          <List>
             {logs.map((log, index) => (
-              <li key={index}>
-                {log.action} by {log.adminEmail} on {new Date(log.timestamp).toLocaleString()}
-              </li>
+              <React.Fragment key={index}>
+                <ListItem>
+                  <ListItemText
+                    primary={`${log.action} by ${log.adminEmail}`}
+                    secondary={new Date(log.timestamp).toLocaleString()}
+                  />
+                </ListItem>
+                <Divider />
+              </React.Fragment>
             ))}
-          </ul>
-          <button onClick={() => setShowLogModal(false)}>Close</button>
-        </div>
-      )}
-    </div>
+          </List>
+        </Paper>
+      </Modal>
+
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={() => setSnackbar({ ...snackbar, open: false })}
+      >
+        <Alert severity={snackbar.severity} sx={{ width: '100%' }}>{snackbar.message}</Alert>
+      </Snackbar>
+    </Box>
   );
 };
 
