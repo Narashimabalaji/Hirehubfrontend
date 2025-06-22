@@ -32,7 +32,7 @@ const AdminDashboard = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/jobs?status=${statusFilter}`, authHeader);
+      const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`, authHeader);
       setJobs(res.data);
     } catch (err) {
       console.error('Error fetching jobs:', err);
