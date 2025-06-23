@@ -297,6 +297,8 @@ console.log("User type:", userType);
                 <Typography variant="caption" color="text.secondary">
                   Posted on {job.postedDate}
                 </Typography>
+                console.log("Applying to job:", job);
+
                 <Button
                   variant="contained"
                   size="small"
