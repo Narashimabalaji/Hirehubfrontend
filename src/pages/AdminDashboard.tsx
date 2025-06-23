@@ -1,29 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import {
   Box, Typography, Button, Tabs, Tab, Paper, Modal,
-  TextField, List, ListItem, ListItemText, Divider
+  TextField, List, ListItem, ListItemText, Divider, Alert
 } from '@mui/material';
 import axios from 'axios';
 
-const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // ✅ Make sure this points to your backend
+const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // Replace with your backend URL
 
-const AdminDashboard = () => {
-  const [jobs, setJobs] = useState([]);
+interface Job {
+  _id: string;
+  title: string;
+  description: string;
+  status: string;
+}
+
+interface Resume {
+  name: string;
+  email: string;
+  resume_url: string;
+  uploaded_at: string;
+}
+
+interface Log {
+  adminEmail: string;
+  jobId: string;
+  jobTitle: string;
+  resumeUrl: string;
+  action: string;
+  timestamp: string;
+}
+
+const AdminDashboard: React.FC = () => {
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [statusFilter, setStatusFilter] = useState('pending');
-  const [selectedJob, setSelectedJob] = useState<any>(null);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [rejectionComment, setRejectionComment] = useState('');
   const [openModal, setOpenModal] = useState(false);
-  const [resumes, setResumes] = useState([]);
-  const [logs, setLogs] = useState([]);
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [openLogModal, setOpenLogModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const adminEmail = localStorage.getItem('adminEmail') || 'admin@hirehub.com';
-  const accessToken = localStorage.getItem('access_token');
+  const accessToken = localStorage.getItem('access_token') || '';
 
   const authHeader = {
     headers: {
-      Authorization: `Bearer ${accessToken}`
-    }
+      Authorization: `Bearer ${accessToken}`,
+    },
   };
 
   useEffect(() => {
@@ -32,18 +56,22 @@ const AdminDashboard = () => {
 
   const fetchJobs = async () => {
     try {
-      const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`, headers: authHeader);
+      setError(null);
+      const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`, authHeader);
       setJobs(res.data);
     } catch (err) {
+      setError('Failed to fetch jobs. Please try again.');
       console.error('Error fetching jobs:', err);
     }
   };
 
   const handleApprove = async (jobId: string) => {
     try {
+      setError(null);
       await axios.post(`${BASE_URL}/approve-job/${jobId}`, {}, authHeader);
       fetchJobs();
     } catch (err) {
+      setError('Failed to approve job. Please try again.');
       console.error('Error approving job:', err);
     }
   };
@@ -51,6 +79,7 @@ const AdminDashboard = () => {
   const handleReject = async () => {
     if (!selectedJob) return;
     try {
+      setError(null);
       await axios.post(`${BASE_URL}/reject_job/${selectedJob._id}`, {
         reason: rejectionComment,
       }, authHeader);
@@ -58,46 +87,50 @@ const AdminDashboard = () => {
       setRejectionComment('');
       fetchJobs();
     } catch (err) {
+      setError('Failed to reject job. Please try again.');
       console.error('Error rejecting job:', err);
     }
   };
 
-  const handleViewResumes = async (job: any) => {
+  const handleViewResumes = async (job: Job) => {
     try {
+      setError(null);
       const res = await axios.get(`${BASE_URL}/resumes/${job._id}`, authHeader);
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
 
-      // Log views
+      // Log views for each resume
       for (const resume of res.data.resumes || []) {
         await axios.get(`${BASE_URL}/admin/view_resume`, {
           params: {
             url: resume.resume_url,
             adminEmail,
             jobId: job._id,
-            jobTitle: job.title
+            jobTitle: job.title,
           },
-          ...authHeader
+          ...authHeader,
         });
       }
     } catch (err) {
+      setError('Failed to fetch resumes. Please try again.');
       console.error('Error viewing resumes:', err);
     }
   };
 
-  const handleDownload = async (resume: any) => {
+  const handleDownload = async (resume: Resume) => {
     try {
+      setError(null);
       const res = await axios.get(`${BASE_URL}/admin/download_resume`, {
         params: {
           url: resume.resume_url,
           adminEmail,
-          jobId: selectedJob._id,
-          jobTitle: selectedJob.title
+          jobId: selectedJob?._id,
+          jobTitle: selectedJob?.title,
         },
         headers: {
-          Authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`,
         },
-        responseType: 'blob'
+        responseType: 'blob',
       });
 
       const url = window.URL.createObjectURL(new Blob([res.data]));
@@ -107,95 +140,146 @@ const AdminDashboard = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
     } catch (err) {
+      setError('Failed to download resume. Please try again.');
       console.error('Error downloading resume:', err);
     }
   };
 
-  const handleViewLogs = async (job: any) => {
+  const handleViewLogs = async (job: Job) => {
     try {
+      setError(null);
       const res = await axios.get(`${BASE_URL}/admin/logs?jobId=${job._id}`, authHeader);
       setLogs(res.data.logs || []);
       setSelectedJob(job);
       setOpenLogModal(true);
     } catch (err) {
+      setError('Failed to fetch logs. Please try again.');
       console.error('Error fetching logs:', err);
     }
   };
 
   return (
-    <Box p={4}>
-      <Typography variant="h4" mb={3}>Admin Dashboard</Typography>
+    <Box sx={{ p: 4, bgcolor: '#f5f5f5', minHeight: '100vh' }}>
+      <Typography variant="h4" mb={3} color="primary">
+        Admin Dashboard
+      </Typography>
 
-      <Tabs value={statusFilter} onChange={(e, val) => setStatusFilter(val)}>
+      {error && (
+        <Alert severity="error" sx={{ mb: 2 }}>
+          {error}
+        </Alert>
+      )}
+
+      <Tabs value={statusFilter} onChange={(e, val) => setStatusFilter(val)} sx={{ mb: 3 }}>
         <Tab label="Pending" value="pending" />
         <Tab label="Approved" value="approved" />
         <Tab label="Rejected" value="rejected" />
       </Tabs>
 
-      {jobs.map((job: any) => (
-        <Paper key={job._id} sx={{ p: 2, my: 2 }}>
-          <Typography variant="h6">{job.title}</Typography>
-          <Typography variant="body2" gutterBottom>{job.description}</Typography>
+      {jobs.length === 0 ? (
+        <Typography>No jobs found for {statusFilter} status.</Typography>
+      ) : (
+        jobs.map((job) => (
+          <Paper key={job._id} sx={{ p: 3, mb: 2, borderRadius: 2, boxShadow: 3 }}>
+            <Typography variant="h6" color="text.primary">{job.title}</Typography>
+            <Typography variant="body2" color="text.secondary" mb={2}>
+              {job.description}
+            </Typography>
 
-          {statusFilter === 'pending' && (
-            <Box mt={1}>
+            {statusFilter === 'pending' && (
+              <Box display="flex" gap={2} mb={2}>
+                <Button
+                  variant="contained"
+                  color="success"
+                  onClick={() => handleApprove(job._id)}
+                >
+                  Approve
+                </Button>
+                <Button
+                  variant="outlined"
+                  color="error"
+                  onClick={() => {
+                    setSelectedJob(job);
+                    setOpenModal(true);
+                  }}
+                >
+                  Reject
+                </Button>
+              </Box>
+            )}
+
+            <Box display="flex" gap={2}>
               <Button
                 variant="contained"
-                color="success"
-                sx={{ mr: 2 }}
-                onClick={() => handleApprove(job._id)}
+                color="primary"
+                onClick={() => handleViewResumes(job)}
               >
-                Approve
+                View Resumes
               </Button>
               <Button
                 variant="outlined"
-                color="error"
-                onClick={() => { setSelectedJob(job); setOpenModal(true); }}
+                color="secondary"
+                onClick={() => handleViewLogs(job)}
               >
-                Reject
+                View Logs
               </Button>
             </Box>
-          )}
-
-          <Box mt={2}>
-            <Button onClick={() => handleViewResumes(job)} sx={{ mr: 2 }}>
-              View Resumes
-            </Button>
-            <Button onClick={() => handleViewLogs(job)} color="secondary">
-              View Logs
-            </Button>
-          </Box>
-        </Paper>
-      ))}
+          </Paper>
+        ))
+      )}
 
       {/* Rejection Modal */}
       <Modal open={openModal} onClose={() => setOpenModal(false)}>
-        <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%' }}>
-          <Typography variant="h6">Rejection Reason</Typography>
+        <Paper sx={{ width: 400, p: 4, mx: 'auto', mt: '20%', borderRadius: 2 }}>
+          <Typography variant="h6" mb={2}>
+            Rejection Reason for {selectedJob?.title}
+          </Typography>
           <TextField
             fullWidth
             multiline
-            rows={3}
+            rows={4}
             value={rejectionComment}
             onChange={(e) => setRejectionComment(e.target.value)}
-            sx={{ my: 2 }}
+            label="Reason for Rejection"
+            variant="outlined"
+            sx={{ mb: 2 }}
           />
-          <Button variant="contained" onClick={handleReject}>Submit</Button>
+          <Box display="flex" gap={2}>
+            <Button variant="contained" color="error" onClick={handleReject}>
+              Submit
+            </Button>
+            <Button variant="outlined" onClick={() => setOpenModal(false)}>
+              Cancel
+            </Button>
+          </Box>
         </Paper>
       </Modal>
 
       {/* Resumes Modal */}
       <Modal open={!!resumes.length} onClose={() => setResumes([])}>
-        <Paper sx={{ width: 500, p: 4, mx: 'auto', mt: '10%' }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper sx={{ width: 500, p: 4, mx: 'auto', mt: '10%', borderRadius: 2 }}>
+          <Typography variant="h6" mb={2}>
             Resumes for {selectedJob?.title}
           </Typography>
           <List>
-            {resumes.map((resume: any, index: number) => (
-              <ListItem key={index} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <ListItemText primary={resume.name} secondary={resume.email} />
-                <Button variant="outlined" onClick={() => handleDownload(resume)}>Download</Button>
+            {resumes.map((resume, index) => (
+              <ListItem
+                key={index}
+                sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}
+              >
+                <ListItemText
+                  primary={resume.name}
+                  secondary={`Email: ${resume.email} | Uploaded: ${new Date(resume.uploaded_at).toLocaleString()}`}
+                />
+                <Button
+                  variant="outlined"
+                  color="primary"
+                  onClick={() => handleDownload(resume)}
+                >
+                  Download
+                </Button>
               </ListItem>
             ))}
           </List>
@@ -204,17 +288,27 @@ const AdminDashboard = () => {
 
       {/* Logs Modal */}
       <Modal open={openLogModal} onClose={() => setOpenLogModal(false)}>
-        <Paper sx={{ width: 600, p: 4, mx: 'auto', mt: '5%', maxHeight: '80vh', overflowY: 'auto' }}>
-          <Typography variant="h6" gutterBottom>
+        <Paper
+          sx={{
+            width: 600,
+            p: 4,
+            mx: 'auto',
+            mt: '5%',
+            maxHeight: '80vh',
+            overflowY: 'auto',
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" mb={2}>
             Logs for {selectedJob?.title}
           </Typography>
           <List>
-            {logs.map((log: any, index: number) => (
+            {logs.map((log, index) => (
               <React.Fragment key={index}>
                 <ListItem>
                   <ListItemText
                     primary={`${log.action.toUpperCase()} by ${log.adminEmail}`}
-                    secondary={new Date(log.timestamp).toLocaleString()}
+                    secondary={`Resume: ${log.resumeUrl.split('/').pop()} | ${new Date(log.timestamp).toLocaleString()}`}
                   />
                 </ListItem>
                 <Divider />
