@@ -300,7 +300,8 @@ console.log("User type:", userType);
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={() =>navigate(`/apply/${job._id}`)}
+                  onClick={() => navigate(`/apply/${job.id}`)}
+
                 >
                   Apply Now
                 </Button>
