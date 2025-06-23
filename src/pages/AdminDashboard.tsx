@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // Replace with your backend URL
+const BASE_URL = 'https://hirehubbackend-5.onrender.com';
 
 interface Job {
   _id: string;
@@ -22,10 +22,10 @@ interface Resume {
 }
 
 interface Log {
-  adminEmail: string;
-  jobId: string;
-  jobTitle: string;
-  resumeUrl: string;
+  email: string;
+  job_id: string;
+  name: string;
+  resume: string;
   action: string;
   timestamp: string;
 }
@@ -59,8 +59,8 @@ const AdminDashboard: React.FC = () => {
       setError(null);
       const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`, authHeader);
       setJobs(res.data);
-    } catch (err) {
-      setError('Failed to fetch jobs. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to fetch jobs. Please try again.');
       console.error('Error fetching jobs:', err);
     }
   };
@@ -70,8 +70,8 @@ const AdminDashboard: React.FC = () => {
       setError(null);
       await axios.post(`${BASE_URL}/approve-job/${jobId}`, {}, authHeader);
       fetchJobs();
-    } catch (err) {
-      setError('Failed to approve job. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to approve job. Please try again.');
       console.error('Error approving job:', err);
     }
   };
@@ -86,8 +86,8 @@ const AdminDashboard: React.FC = () => {
       setOpenModal(false);
       setRejectionComment('');
       fetchJobs();
-    } catch (err) {
-      setError('Failed to reject job. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to reject job. Please try again.');
       console.error('Error rejecting job:', err);
     }
   };
@@ -99,20 +99,27 @@ const AdminDashboard: React.FC = () => {
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
 
-      // Log views for each resume
+      // Log views and open resumes
       for (const resume of res.data.resumes || []) {
-        await axios.get(`${BASE_URL}/admin/view_resume`, {
-          params: {
-            url: resume.resume_url,
-            adminEmail,
-            jobId: job._id,
-            jobTitle: job.title,
-          },
-          ...authHeader,
-        });
+        try {
+          const viewRes = await axios.get(`${BASE_URL}/admin/view_resume`, {
+            params: {
+              url: resume.resume_url,
+              adminEmail,
+              jobId: job._id,
+              jobTitle: job.title,
+            },
+            headers: authHeader.headers,
+          });
+          if (viewRes.data.resume_url) {
+            window.open(viewRes.data.resume_url, '_blank');
+          }
+        } catch (viewErr: any) {
+          console.error('Error logging view for resume:', resume.resume_url, viewErr);
+        }
       }
-    } catch (err) {
-      setError('Failed to fetch resumes. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to fetch resumes. Please try again.');
       console.error('Error viewing resumes:', err);
     }
   };
@@ -127,9 +134,7 @@ const AdminDashboard: React.FC = () => {
           jobId: selectedJob?._id,
           jobTitle: selectedJob?.title,
         },
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers: authHeader.headers,
         responseType: 'blob',
       });
 
@@ -141,8 +146,8 @@ const AdminDashboard: React.FC = () => {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err) {
-      setError('Failed to download resume. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to download resume. Please try again.');
       console.error('Error downloading resume:', err);
     }
   };
@@ -154,8 +159,8 @@ const AdminDashboard: React.FC = () => {
       setLogs(res.data.logs || []);
       setSelectedJob(job);
       setOpenLogModal(true);
-    } catch (err) {
-      setError('Failed to fetch logs. Please try again.');
+    } catch (err: any) {
+      setError(err.response?.data?.error || 'Failed to fetch logs. Please try again.');
       console.error('Error fetching logs:', err);
     }
   };
@@ -264,7 +269,7 @@ const AdminDashboard: React.FC = () => {
             Resumes for {selectedJob?.title}
           </Typography>
           <List>
-            {resumes.map((resume, index) => (
+            {resumes.map((resume: Resume, index) => (
               <ListItem
                 key={index}
                 sx={{ display: 'flex', justifyContent: 'space-between', py: 1 }}
@@ -303,12 +308,12 @@ const AdminDashboard: React.FC = () => {
             Logs for {selectedJob?.title}
           </Typography>
           <List>
-            {logs.map((log, index) => (
+            {logs.map((log: Log, index) => (
               <React.Fragment key={index}>
                 <ListItem>
                   <ListItemText
-                    primary={`${log.action.toUpperCase()} by ${log.adminEmail}`}
-                    secondary={`Resume: ${log.resumeUrl.split('/').pop()} | ${new Date(log.timestamp).toLocaleString()}`}
+                    primary={`${log.action.toUpperCase()} by ${log.email}`}
+                    secondary={`Resume: ${log.resume.split('/').pop()} | ${new Date(log.timestamp).toLocaleString()}`}
                   />
                 </ListItem>
                 <Divider />
