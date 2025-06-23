@@ -105,8 +105,9 @@ console.log("User type:", userType);
   return (
   <Paper elevation={1} sx={{ p: 3, borderRadius: 2 }}>
     
-      {(userType === 'hirer' || userType === 'admin') && (
-      <Box display="flex" justifyContent="flex-end" mb={2}>
+    {/* Hirer Only: Post Job Button */}
+    {userType === 'hirer' &&  (
+      <Box display="flex" justifyContent="flex-end" mb={3}>
         <Button
           variant="contained"
           color="primary"
@@ -116,20 +117,6 @@ console.log("User type:", userType);
         </Button>
       </Box>
     )}
-
-    {/* Admin Only: Dashboard Button */}
-    {userType === 'admin' && (
-      <Box display="flex" justifyContent="flex-end" mb={2}>
-        <Button
-          variant="outlined"
-          color="secondary"
-          onClick={() => navigate('/admin')}
-        >
-          Admin Dashboard
-        </Button>
-      </Box>
-)}
-
 
     {/* Filter Section */}
     <Box mb={4}>
@@ -300,7 +287,7 @@ console.log("User type:", userType);
                 <Button
                   variant="contained"
                   size="small"
-                  onClick={() =>navigate(`/apply/${job._id}`)}
+                  onClick={() => navigate(`/apply/${job.id}`)}
                 >
                   Apply Now
                 </Button>
