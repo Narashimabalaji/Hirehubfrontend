@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const BASE_URL = 'https://hirehubbackend-5.onrender.com'; // Change if deployed
+const BASE_URL = 'https://hirehubbackend-5.onrender.com';
 
 interface Job {
   _id: string;
@@ -42,6 +42,13 @@ const AdminDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const adminEmail = localStorage.getItem('adminEmail') || 'admin@hirehub.com';
+  const accessToken = localStorage.getItem('access_token') || '';
+
+  const authHeader = {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
 
   useEffect(() => {
     fetchJobs();
@@ -50,7 +57,7 @@ const AdminDashboard: React.FC = () => {
   const fetchJobs = async () => {
     try {
       setError(null);
-      const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`);
+      const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`, authHeader);
       setJobs(res.data);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch jobs.');
@@ -59,7 +66,7 @@ const AdminDashboard: React.FC = () => {
 
   const handleApprove = async (jobId: string) => {
     try {
-      await axios.post(`${BASE_URL}/approve-job/${jobId}`);
+      await axios.post(`${BASE_URL}/approve-job/${jobId}`, {}, authHeader);
       fetchJobs();
     } catch (err: any) {
       setError('Failed to approve job.');
@@ -71,7 +78,7 @@ const AdminDashboard: React.FC = () => {
     try {
       await axios.post(`${BASE_URL}/reject_job/${selectedJob._id}`, {
         reason: rejectionComment,
-      });
+      }, authHeader);
       setOpenModal(false);
       setRejectionComment('');
       fetchJobs();
@@ -82,11 +89,10 @@ const AdminDashboard: React.FC = () => {
 
   const handleViewResumes = async (job: Job) => {
     try {
-      const res = await axios.get(`${BASE_URL}/resumes/${job._id}`);
+      const res = await axios.get(`${BASE_URL}/resumes/${job._id}`, authHeader);
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
 
-      // Log view
       for (const resume of res.data.resumes || []) {
         await axios.get(`${BASE_URL}/admin/view_resume`, {
           params: {
@@ -95,6 +101,7 @@ const AdminDashboard: React.FC = () => {
             jobId: job._id,
             jobTitle: job.title,
           },
+          ...authHeader,
         });
       }
     } catch {
@@ -111,6 +118,7 @@ const AdminDashboard: React.FC = () => {
           jobId: selectedJob?._id,
           jobTitle: selectedJob?.title,
         },
+        ...authHeader,
         responseType: 'blob',
       });
 
@@ -131,8 +139,10 @@ const AdminDashboard: React.FC = () => {
     try {
       const res = await axios.get(`${BASE_URL}/admin/logs`, {
         params: { jobId: job._id },
+        ...authHeader,
       });
       setLogs(res.data.logs || []);
+      setSelectedJob(job);
       setOpenLogModal(true);
     } catch {
       setError('Failed to fetch logs.');
