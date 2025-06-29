@@ -32,7 +32,7 @@ const useStore = create((set, get) => ({
         const refreshToken = getRefreshToken();
         if (!refreshToken) throw new Error("No refresh token found");
 
-        const refreshRes = await fetch('https://hirehubbackend-5.onrender.com/api/token/refresh', {
+        const refreshRes = await fetch('https://hirehubbackend-5.onrender.com/refresh', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ refresh_token: refreshToken })
