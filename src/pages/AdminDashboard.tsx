@@ -57,7 +57,7 @@ const AdminDashboard: React.FC = () => {
   const fetchJobs = async () => {
     try {
       setError(null);
-      const res = await axios.get(`${BASE_URL}/api/jobs?status=${statusFilter}`, authHeader);
+      const res = await axios.get(`${BASE_URL}/api/fetchjobs?status=${statusFilter}`, authHeader);
       setJobs(res.data);
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to fetch jobs.');
