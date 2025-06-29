@@ -12,7 +12,7 @@ const useStore = create((set, get) => ({
     set({ jobsLoading: true });
   
     const getAccessToken = () => localStorage.getItem('access_token');
-    const getRefreshToken = () => localStorage.getItem('refresh_token');
+    const getRefreshToken = () => localStorage.getItem('refreshToken');
     const setAccessToken = (token) => localStorage.setItem('access_token', token);
   
     const fetchWithToken = async (token) => {
@@ -63,8 +63,8 @@ const useStore = create((set, get) => ({
         title: job.title,
         description: job.description,
         company: job.created_by || "Unknown",
-        location: "Remote",
-        salary: "Negotiable",
+        location: job.location,
+        salary: job.salary,
         skills: job.keywords || [],
         postedDate: new Date(job.created_at).toLocaleDateString(),
       }));
