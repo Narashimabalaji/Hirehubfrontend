@@ -1,4 +1,3 @@
-
 import { create } from 'zustand';
 
 const useStore = create((set, get) => ({
@@ -10,11 +9,11 @@ const useStore = create((set, get) => ({
 
   fetchJobs: async () => {
     set({ jobsLoading: true });
-  
+
     const getAccessToken = () => localStorage.getItem('access_token');
     const getRefreshToken = () => localStorage.getItem('refreshToken');
     const setAccessToken = (token) => localStorage.setItem('access_token', token);
-  
+
     const fetchWithToken = async (token) => {
       return await fetch('https://hirehubbackend-5.onrender.com/api/jobs', {
         headers: {
@@ -23,55 +22,49 @@ const useStore = create((set, get) => ({
         },
       });
     };
-  
+
     try {
       let token = getAccessToken();
       let res = await fetchWithToken(token);
-  
-      // If unauthorized, try refreshing token
+
+      // If token expired or invalid, try refresh
       if (res.status === 401) {
         const refreshToken = getRefreshToken();
-        if (!refreshToken) throw new Error("No refresh token available");
-  
-        // Call your refresh endpoint - adjust URL & method as needed
+        if (!refreshToken) throw new Error("No refresh token found");
+
         const refreshRes = await fetch('https://hirehubbackend-5.onrender.com/api/token/refresh', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: refreshToken }),
+          body: JSON.stringify({ refresh_token: refreshToken })
         });
-  
-        if (!refreshRes.ok) {
-          throw new Error("Refresh token invalid or expired");
-        }
-  
-        const refreshData = await refreshRes.json();
-        if (!refreshData.access_token) {
-          throw new Error("No new access token in refresh response");
-        }
-  
-        // Save new access token
-        setAccessToken(refreshData.access_token);
-  
-        // Retry fetching jobs with new token
-        res = await fetchWithToken(refreshData.access_token);
-        if (!res.ok) throw new Error("Failed to fetch jobs after token refresh");
-      }
-      const data = await res.json();
 
+        const refreshData = await refreshRes.json();
+        if (!refreshRes.ok || !refreshData.access_token) {
+          throw new Error("Failed to refresh token");
+        }
+
+        // Store new access token
+        setAccessToken(refreshData.access_token);
+        res = await fetchWithToken(refreshData.access_token);
+      }
+
+      if (!res.ok) throw new Error("Failed after retry");
+
+      const data = await res.json();
       const formatted = data.map((job) => ({
-        id: job.id,
+        id: job.id || job._id,
         title: job.title,
         description: job.description,
         company: job.created_by || "Unknown",
-        location: job.location,
-        salary: job.salary,
+        location: job.location || "Remote",
+        salary: job.salary || "Negotiable",
         skills: job.keywords || [],
         postedDate: new Date(job.created_at).toLocaleDateString(),
       }));
 
       set({ jobs: formatted, filteredJobs: formatted, jobsLoading: false });
     } catch (error) {
-      console.error("Failed to fetch jobs", error);
+      console.error("Job fetch failed:", error);
       set({ jobsLoading: false });
     }
   },
