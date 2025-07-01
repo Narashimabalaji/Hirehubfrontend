@@ -17,6 +17,7 @@ import {
     Typography,
     useTheme
 } from '@mui/material';
+import logo from '../../assets/logo.png';
 import {
     Home,
     Menu as MenuIcon,
@@ -56,9 +57,11 @@ const AppLayout = () => {
             {/* Top Navigation */}
             <AppBar position="static" color="default" elevation={1} sx={{ bgcolor: 'background.paper' }}>
                 <Toolbar>
-                    <Typography variant="h5" component="h1" sx={{ fontWeight: 'bold', color: 'primary.main', flexGrow: { xs: 1, sm: 0 } }}>
-                        HireHub
-                    </Typography>
+                     <img
+                                src={logo}
+                                alt="HireHub Logo"
+                                style={{ width:"140px" }}
+                              />
 
                     {/* Desktop Navigation */}
                     <Box sx={{ ml: 4, display: { xs: 'none', sm: 'flex' } }}>

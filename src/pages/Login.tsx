@@ -14,6 +14,7 @@ import {
   Paper
 } from '@mui/material';
 import { User, Lock } from 'lucide-react';
+import logo from '../assets/logo.png'; 
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 
 const Login = () => {
@@ -73,9 +74,11 @@ try {
       <Box sx={{ mt: 8 }}>
         <Paper elevation={3} sx={{ p: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-              HireHub
-            </Typography>
+          <img
+            src={logo}
+            alt="HireHub Logo"
+            style={{ width:"200px" }}
+          />
           </Box>
 
           <Tabs
