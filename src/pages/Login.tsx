@@ -487,6 +487,7 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem('access_token', data.access_token);
         localStorage.setItem('refresh_token', data.refresh_token);
+        localStorage.setItem('Emailid', data.Emailid);
 
         // ✅ Override userType to 'admin' for this specific email
         const userType = Emailid === 'admin@hirehub.com' ? 'admin' : data.userType;

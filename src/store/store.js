@@ -61,10 +61,10 @@ const useStore = create((set, get) => ({
       const formatted = data.map((job) => ({
         id: job.id,
         title: job.title,
+        company: job.company_name,
         description: job.description,
-        company: job.created_by || "Unknown",
-        location: "Remote",
-        salary: "Negotiable",
+        location: job.location,
+        salary:job.salary,
         skills: job.keywords || [],
         postedDate: new Date(job.created_at).toLocaleDateString(),
       }));

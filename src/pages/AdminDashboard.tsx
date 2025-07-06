@@ -9,6 +9,7 @@ const BASE_URL = 'https://hirehubbackend-5.onrender.com';
 
 interface Job {
   _id: string;
+  id: string;
   title: string;
   description: string;
   status: string;
@@ -89,7 +90,7 @@ const AdminDashboard: React.FC = () => {
 
   const handleViewResumes = async (job: Job) => {
     try {
-      const res = await axios.get(`${BASE_URL}/resumes/${job._id}`, authHeader);
+      const res = await axios.get(`${BASE_URL}/resumes/${job.id}`, authHeader);
       setSelectedJob(job);
       setResumes(res.data.resumes || []);
 
@@ -99,6 +100,7 @@ const AdminDashboard: React.FC = () => {
             url: resume.resume_url,
             adminEmail,
             jobId: job._id,
+            id:job.id,
             jobTitle: job.title,
           },
           ...authHeader,
@@ -116,6 +118,7 @@ const AdminDashboard: React.FC = () => {
           url: resume.resume_url,
           adminEmail,
           jobId: selectedJob?._id,
+          id:selectedJob?.id,
           jobTitle: selectedJob?.title,
         },
         ...authHeader,
@@ -179,7 +182,7 @@ const AdminDashboard: React.FC = () => {
 
             {statusFilter === 'pending' && (
               <Box display="flex" gap={2} mb={2}>
-                <Button variant="contained" color="success" onClick={() => handleApprove(job._id)}>
+                <Button variant="contained" color="success" onClick={() => handleApprove(job.id)}>
                   Approve
                 </Button>
                 <Button

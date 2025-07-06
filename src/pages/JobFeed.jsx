@@ -228,7 +228,7 @@ console.log("User type:", userType);
                 <Box>
                   <Typography variant="h6">{job.title}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {job.company} • {job.location}
+                    {job.company} {job.location}
                   </Typography>
                 </Box>
                 <Box display="flex" gap={1}>

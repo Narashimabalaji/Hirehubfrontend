@@ -14,6 +14,8 @@ import {
 } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
+const emailid = localStorage.getItem('Emailid');
+
 const HirerJobPost = () => {
   const [formData, setFormData] = useState({
     title: '',
@@ -24,7 +26,11 @@ const HirerJobPost = () => {
     keywordInput: '',
     company: '',
     salary: '',
-    location: ''
+    location: '',
+    company_name: '',
+    hireremailid: '',
+    hirername:''
+
   });
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -56,7 +62,7 @@ const HirerJobPost = () => {
     e.preventDefault();
 
     const token = localStorage.getItem('access_token');
-    const hirer_id = localStorage.getItem('userId') || '62145';
+    const hirer_id = localStorage.getItem('userId');
 
     if (!token) {
       alert("You are not authenticated. Please log in again.");
@@ -66,6 +72,7 @@ const HirerJobPost = () => {
     const payload = {
       ...formData,
       hirer_id,
+      hirer_emailid:emailid,
       keywords: formData.keywords
     };
 
@@ -116,6 +123,24 @@ const HirerJobPost = () => {
                 value={formData.company}
                 onChange={handleChange}
                 required
+              />
+            </Grid>
+             <Grid item xs={12} sm={6}>
+              <TextField
+                label="hirername"
+                name="hirername"
+                fullWidth
+                value={formData.hirername}
+                onChange={handleChange}
+              />
+               </Grid>
+             <Grid item xs={12} sm={6}>
+              <TextField
+                label="hireremailid"
+                name="hireremailid"
+                fullWidth
+                value={formData.hireremailid}
+                onChange={handleChange}
               />
             </Grid>
             <Grid item xs={12}>
