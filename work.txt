@@ -1,0 +1,5 @@
+UI updates
+if user authenticated already,can't open login 
+role based Login 
+hirer dashboard
+AI job description
