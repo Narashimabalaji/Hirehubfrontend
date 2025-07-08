@@ -260,7 +260,7 @@ const NavaBot = () => {
             <IconButton
               onClick={toggleChat}
               sx={{
-                bgcolor: "primary.main",
+                bgcolor: "#36a9e4",
                 color: "white",
                 width: 64,
                 height: 64,
@@ -304,7 +304,7 @@ const NavaBot = () => {
             elevation={12}
             sx={{
               width: 380,
-              height: 600,
+              height: 500,
               borderRadius: 3,
               overflow: "hidden",
               display: "flex",

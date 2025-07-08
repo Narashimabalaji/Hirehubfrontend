@@ -16,7 +16,7 @@ const useStore = create((set, get) => ({
     const setAccessToken = (token) => localStorage.setItem('access_token', token);
   
     const fetchWithToken = async (token) => {
-      return await fetch('https://hirehubbackend-5.onrender.com/api/jobs', {
+      return await fetch(`${process.env.REACT_APP_BASE_URL}/api/jobs`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -34,10 +34,10 @@ const useStore = create((set, get) => ({
         if (!refreshToken) throw new Error("No refresh token available");
   
         // Call your refresh endpoint - adjust URL & method as needed
-        const refreshRes = await fetch('https://hirehubbackend-5.onrender.com/refresh', {
+        const refreshRes = await fetch(`${process.env.REACT_APP_BASE_URL}/refresh`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refresh_token: refreshToken }),
+          body: JSON.stringify({ refreshToken: refreshToken }),
         });
   
         if (!refreshRes.ok) {

@@ -55,25 +55,45 @@ const AppLayout = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', bgcolor: 'grey.50' }}>
             {/* Top Navigation */}
-            <AppBar position="static" color="default" elevation={1} sx={{ bgcolor: 'background.paper' }}>
+            <AppBar
+                position="sticky"
+                elevation={0}
+                sx={{
+                    bgcolor: 'background.paper',
+                    borderBottom: '1px solid',
+                    borderColor: 'divider',
+                    backdropFilter: 'blur(8px)',
+                    background: 'rgba(255, 255, 255, 0.95)'
+                }}
+            >
                 <Toolbar>
-                     <img
-                                src={logo}
-                                alt="HireHub Logo"
-                                style={{ width:"140px" }}
-                              />
+                    <img
+                        src={logo}
+                        alt="HireHub Logo"
+                        style={{ width: "140px", height: "auto" }}
+                        onClick={() => navigate('/home')}
+                    />
 
                     {/* Desktop Navigation */}
-                    <Box sx={{ ml: 4, display: { xs: 'none', sm: 'flex' } }}>
+                    <Box sx={{ ml: 6, display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
                         <Button
                             startIcon={<Home />}
                             onClick={() => navigate('/dashboard')}
                             sx={{
-                                mr: 2,
-                                color: 'text.primary',
-                                borderBottom: `2px solid ${theme.palette.primary.main}`,
-                                borderRadius: 0,
-                                px: 1
+                                mr: 1,
+                                color: 'primary.main',
+                                bgcolor: 'primary.50',
+                                borderRadius: 2,
+                                px: 2,
+                                py: 1,
+                                fontSize: '0.875rem',
+                                fontWeight: 600,
+                                textTransform: 'none',
+                                '&:hover': {
+                                    bgcolor: 'primary.100',
+                                    transform: 'translateY(-1px)',
+                                },
+                                transition: 'all 0.2s ease-in-out'
                             }}
                         >
                             Dashboard
@@ -85,13 +105,18 @@ const AppLayout = () => {
                                 onClick={() => navigate('/hirer')}
                                 sx={{
                                     color: 'text.secondary',
+                                    borderRadius: 2,
+                                    px: 2,
+                                    py: 1,
+                                    fontSize: '0.875rem',
+                                    fontWeight: 500,
+                                    textTransform: 'none',
                                     '&:hover': {
-                                        color: 'text.primary',
-                                        borderBottom: `2px solid ${theme.palette.grey[300]}`,
+                                        color: 'primary.main',
+                                        bgcolor: 'action.hover',
+                                        transform: 'translateY(-1px)',
                                     },
-                                    borderBottom: '2px solid transparent',
-                                    borderRadius: 0,
-                                    px: 1
+                                    transition: 'all 0.2s ease-in-out'
                                 }}
                             >
                                 My Job Posts
@@ -102,13 +127,18 @@ const AppLayout = () => {
                                 onClick={() => navigate('/saved')}
                                 sx={{
                                     color: 'text.secondary',
+                                    borderRadius: 2,
+                                    px: 2,
+                                    py: 1,
+                                    fontSize: '0.875rem',
+                                    fontWeight: 500,
+                                    textTransform: 'none',
                                     '&:hover': {
-                                        color: 'text.primary',
-                                        borderBottom: `2px solid ${theme.palette.grey[300]}`,
+                                        color: 'primary.main',
+                                        bgcolor: 'action.hover',
+                                        transform: 'translateY(-1px)',
                                     },
-                                    borderBottom: '2px solid transparent',
-                                    borderRadius: 0,
-                                    px: 1
+                                    transition: 'all 0.2s ease-in-out'
                                 }}
                             >
                                 Saved Jobs
@@ -119,19 +149,46 @@ const AppLayout = () => {
                     <Box sx={{ flexGrow: 1 }} />
 
                     {/* Desktop User Menu */}
-                    <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center' }}>
-                        <Avatar sx={{ bgcolor: 'grey.200', color: 'text.secondary', width: 32, height: 32 }}>
-                            <UserIcon size={20} />
-                        </Avatar>
+                    <Box sx={{ display: { xs: 'none', md: 'flex' }, alignItems: 'center', gap: 2 }}>
+                        <Box sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 1.5,
+                            bgcolor: 'grey.50',
+                            borderRadius: 3,
+                            px: 2,
+                            py: 1
+                        }}>
+                            <Avatar sx={{
+                                bgcolor: 'primary.main',
+                                width: 36,
+                                height: 36,
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                            }}>
+                                <UserIcon size={18} />
+                            </Avatar>
+                            <Box>
+                                <Typography variant="body2" fontWeight={600} color="text.primary">
+                                    {user?.Emailid?.split('@')[0] || "User"}
+                                </Typography>
+                            </Box>
+                        </Box>
+
                         <Button
-                            variant="contained"
+                            variant="text"
                             color="error"
-                            startIcon={<LogoutIcon />}
                             size="small"
-                            sx={{ ml: 2 }}
+                            sx={{
+                                borderRadius: 2,
+                                px:0,
+                                py: 1,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                transition: 'all 0.2s ease-in-out'
+                            }}
                             onClick={handleLogout}
                         >
-                            Logout
+                            <LogoutIcon size={20} />
                         </Button>
                     </Box>
 
@@ -142,7 +199,15 @@ const AppLayout = () => {
                         color="inherit"
                         aria-label="menu"
                         onClick={toggleMobileMenu}
-                        sx={{ display: { sm: 'none' } }}
+                        sx={{
+                            display: { md: 'none' },
+                            color: 'text.primary',
+                            '&:hover': {
+                                bgcolor: 'action.hover',
+                                transform: 'scale(1.1)',
+                            },
+                            transition: 'all 0.2s ease-in-out'
+                        }}
                     >
                         {mobileMenuOpen ? <CloseIcon /> : <MenuIcon />}
                     </IconButton>
@@ -154,47 +219,129 @@ const AppLayout = () => {
                 anchor="left"
                 open={mobileMenuOpen}
                 onClose={toggleMobileMenu}
-                sx={{ display: { sm: 'none' } }}
+                sx={{
+                    display: { md: 'none' },
+                    '& .MuiDrawer-paper': {
+                        width: 280,
+                        bgcolor: 'background.paper',
+                        borderRight: '1px solid',
+                        borderColor: 'divider',
+                    }
+                }}
             >
-                <Box sx={{ width: 250 }} role="presentation">
-                    <List>
-                        <ListItem disablePadding>
-                            <ListItemButton selected onClick={() => { navigate('/dashboard'); toggleMobileMenu(); }}>
+                <Box sx={{ width: 280 }} role="presentation">
+                    {/* Drawer Header */}
+                    <Box sx={{
+                        p: 3,
+                        borderBottom: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'primary.50'
+                    }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                            <Avatar sx={{
+                                bgcolor: 'primary.main',
+                                width: 48,
+                                height: 48,
+                                boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                            }}>
+                                <UserIcon size={24} />
+                            </Avatar>
+                            <Box>
+                                <Typography variant="h6" fontWeight={600} color="text.primary">
+                                    {user?.Emailid?.split('@')[0] || "User"}
+                                </Typography>
+                            </Box>
+                        </Box>
+                    </Box>
+
+                    {/* Navigation Items */}
+                    <List sx={{ px: 2, py: 2 }}>
+                        <ListItem disablePadding sx={{ mb: 1 }}>
+                            <ListItemButton
+                                selected
+                                onClick={() => { navigate('/dashboard'); toggleMobileMenu(); }}
+                                sx={{
+                                    borderRadius: 2,
+                                    py: 1.5,
+                                    '&.Mui-selected': {
+                                        bgcolor: 'primary.50',
+                                        color: 'primary.main',
+                                        '&:hover': {
+                                            bgcolor: 'primary.100',
+                                        },
+                                    },
+                                    '&:hover': {
+                                        bgcolor: 'action.hover',
+                                    },
+                                    transition: 'all 0.2s ease-in-out'
+                                }}
+                            >
                                 <ListItemIcon>
-                                    <Home color={theme.palette.primary.main} />
+                                    <Home color="primary" />
                                 </ListItemIcon>
-                                <ListItemText primary="Dashboard" primaryTypographyProps={{ color: 'primary' }} />
+                                <ListItemText
+                                    primary="Dashboard"
+                                    primaryTypographyProps={{
+                                        fontWeight: 600,
+                                        color: 'primary.main'
+                                    }}
+                                />
                             </ListItemButton>
                         </ListItem>
 
-                        <ListItem disablePadding>
-                            <ListItemButton onClick={() => { navigate(userType === 'hirer' ? '/hirer' : '/saved'); toggleMobileMenu(); }}>
+                        <ListItem disablePadding sx={{ mb: 1 }}>
+                            <ListItemButton
+                                onClick={() => { navigate(userType === 'hirer' ? '/hirer' : '/saved'); toggleMobileMenu(); }}
+                                sx={{
+                                    borderRadius: 2,
+                                    py: 1.5,
+                                    '&:hover': {
+                                        bgcolor: 'action.hover',
+                                    },
+                                    transition: 'all 0.2s ease-in-out'
+                                }}
+                            >
                                 <ListItemIcon>
                                     <BriefcaseBusinessIcon />
                                 </ListItemIcon>
-                                <ListItemText primary={userType === 'hirer' ? "My Job Posts" : "Saved Jobs"} />
+                                <ListItemText
+                                    primary={userType === 'hirer' ? "My Job Posts" : "Saved Jobs"}
+                                    primaryTypographyProps={{
+                                        fontWeight: 500
+                                    }}
+                                />
                             </ListItemButton>
                         </ListItem>
                     </List>
 
-                    <Divider />
-
-                    <Box sx={{ p: 2 }}>
-                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-                            <Avatar sx={{ bgcolor: 'grey.200', mr: 2 }}>
-                                <UserIcon />
-                            </Avatar>
-                            <Box>
-                                <Typography variant="body1">{user?.Emailid || "User"}</Typography>
-                                <Typography variant="body2" color="text.secondary">{user?.userType || "role"}</Typography>
-                            </Box>
-                        </Box>
-
+                    {/* Logout Section */}
+                    <Box sx={{
+                        position: 'absolute',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        p: 3,
+                        borderTop: '1px solid',
+                        borderColor: 'divider',
+                        bgcolor: 'background.paper'
+                    }}>
                         <Button
                             variant="contained"
                             color="error"
                             startIcon={<LogoutIcon />}
                             fullWidth
+                            sx={{
+                                borderRadius: 2,
+                                py: 1.5,
+                                textTransform: 'none',
+                                fontWeight: 600,
+                                boxShadow: '0 2px 8px rgba(244, 67, 54, 0.2)',
+                                '&:hover': {
+                                    boxShadow: '0 4px 12px rgba(244, 67, 54, 0.3)',
+                                    transform: 'translateY(-1px)',
+                                },
+                                transition: 'all 0.2s ease-in-out'
+                            }}
                             onClick={() => {
                                 handleLogout();
                                 toggleMobileMenu();
@@ -207,8 +354,8 @@ const AppLayout = () => {
             </Drawer>
 
             {/* Main content */}
-            <Box component="main" sx={{ flexGrow: 1, py: 3 }}>
-                <Container maxWidth="lg">
+            <Box component="main" sx={{ py: 3 }}>
+                <Container maxWidth="xl">
                     <Outlet />
                 </Container>
             </Box>
