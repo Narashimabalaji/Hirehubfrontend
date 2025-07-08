@@ -3,3 +3,4 @@ if user authenticated already,can't open login
 role based Login 
 hirer dashboard
 AI job description
+to be added in jobs api tags, company name
