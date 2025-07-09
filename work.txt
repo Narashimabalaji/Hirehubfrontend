@@ -4,3 +4,45 @@ role based Login
 hirer dashboard
 AI job description
 to be added in jobs api tags, company name
+job apply form UI enhace
+admin dashboard work
+
+
+Backend update
+Single Job route--->done
+
+
+1.'/posted/hirer_jobs'----->route for Hirer_jobs 
+i/p---->{
+  "emailid": "admin@hirehub.com"
+}
+
+
+2.'/particularjob/<string:job_id>'-------->route for particular job details
+
+i/p----->/particularjob/686a140aabe378174f886da2
+
+
+3./save_job ------>route for save jobs
+
+i/p---->{
+  "emailid": "admin@hirehub.com",
+  "job_id":"686d0671ec149ff62d73fd4f"
+}
+
+
+4./unsave_job------>for unsave jobs
+
+i/p--->{
+  "emailid": "admin@hirehub.com",
+  "job_id":"686d0671ec149ff62d73fd4f"
+}
+
+5.'/saved_jobs/<string:email>'---->fetch the saved jobs
+
+i/p--->/saved_jobs/admin@hirehub.com
+
+
+
+
+
