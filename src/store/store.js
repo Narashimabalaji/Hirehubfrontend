@@ -1,5 +1,6 @@
 
 import { create } from 'zustand';
+import { fetchJobsAPI } from "../api/jobAPi" 
 
 const useStore = create((set, get) => ({
   jobs: [],
@@ -10,53 +11,10 @@ const useStore = create((set, get) => ({
 
   fetchJobs: async () => {
     set({ jobsLoading: true });
-  
-    const getAccessToken = () => localStorage.getItem('access_token');
-    const getRefreshToken = () => localStorage.getItem('refresh_token');
-    const setAccessToken = (token) => localStorage.setItem('access_token', token);
-  
-    const fetchWithToken = async (token) => {
-      return await fetch(`${process.env.REACT_APP_BASE_URL}/api/jobs`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-    };
-  
+    
     try {
-      let token = getAccessToken();
-      let res = await fetchWithToken(token);
-  
-      // If unauthorized, try refreshing token
-      if (res.status === 401) {
-        const refreshToken = getRefreshToken();
-        if (!refreshToken) throw new Error("No refresh token available");
-  
-        // Call your refresh endpoint - adjust URL & method as needed
-        const refreshRes = await fetch(`${process.env.REACT_APP_BASE_URL}/refresh`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken: refreshToken }),
-        });
-  
-        if (!refreshRes.ok) {
-          throw new Error("Refresh token invalid or expired");
-        }
-  
-        const refreshData = await refreshRes.json();
-        if (!refreshData.access_token) {
-          throw new Error("No new access token in refresh response");
-        }
-  
-        // Save new access token
-        setAccessToken(refreshData.access_token);
-  
-        // Retry fetching jobs with new token
-        res = await fetchWithToken(refreshData.access_token);
-        if (!res.ok) throw new Error("Failed to fetch jobs after token refresh");
-      }
-      const data = await res.json();
+
+      const data = await fetchJobsAPI();
 
       const formatted = data.map((job) => ({
         id: job.id,

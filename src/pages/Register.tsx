@@ -1,158 +1,3 @@
-// import React, { useState } from 'react';
-// import {
-//   Box,
-//   Container,
-//   Typography,
-//   TextField,
-//   Button,
-//   Card,
-//   CardContent,
-//   Alert,
-//   Paper,
-//   Link,
-// } from '@mui/material';
-// import { User, Mail, Lock } from 'lucide-react';
-// import { useNavigate } from 'react-router-dom';
-
-// const Register = () => {
-//   const [name, setName] = useState('');
-//   const [Emailid, setEmail] = useState('');
-//   const [password, setPassword] = useState('');
-//   const [userType, setUserType] = useState('seeker'); // 'hirer' or 'seeker'
-//   const [error, setError] = useState('');
-//   const [success, setSuccess] = useState('');
-
-//   const navigate = useNavigate();
-
-//   const handleRegister = async (e) => {
-//     e.preventDefault();
-//     setError('');
-//     setSuccess('');
-
-//     if (!name || !Emailid || !password) {
-//       setError('Please fill in all fields');
-//       return;
-//     }
-
-//     try {
-//       const response = await fetch('https://hirehubbackend-5.onrender.com/register', {
-//         method: 'POST',
-//         headers: {
-//           'Content-Type': 'application/json'
-//         },
-//         body: JSON.stringify({
-//           name,
-//           Emailid,
-//           password,
-//           userType
-//         })
-//       });
-
-//       const data = await response.json();
-
-//       if (response.ok) {
-//         setSuccess('Registration successful. You can now log in.');
-//         setTimeout(() => navigate('/'), 2000);
-//       } else {
-//         setError(data.message || 'Registration failed');
-//       }
-//     } catch (err) {
-//       console.error(err);
-//       setError('Something went wrong. Please try again.');
-//     }
-//   };
-
-//   return (
-//     <Container maxWidth="sm">
-//       <Box sx={{ mt: 8 }}>
-//         <Paper elevation={3} sx={{ p: 4 }}>
-//           <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-//             <Typography variant="h4" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-//               Register
-//             </Typography>
-//           </Box>
-
-//           {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-//           {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
-
-//           <Box component="form" onSubmit={handleRegister}>
-//             <TextField
-//               margin="normal"
-//               required
-//               fullWidth
-//               label="Full Name"
-//               value={name}
-//               onChange={(e) => setName(e.target.value)}
-//               InputProps={{
-//                 startAdornment: <User size={20} style={{ marginRight: 8, color: '#666' }} />,
-//               }}
-//             />
-//             <TextField
-//               margin="normal"
-//               required
-//               fullWidth
-//               label="Email Address"
-//               value={Emailid}
-//               onChange={(e) => setEmail(e.target.value)}
-//               InputProps={{
-//                 startAdornment: <Mail size={20} style={{ marginRight: 8, color: '#666' }} />,
-//               }}
-//             />
-//             <TextField
-//               margin="normal"
-//               required
-//               fullWidth
-//               label="Password"
-//               type="password"
-//               value={password}
-//               onChange={(e) => setPassword(e.target.value)}
-//               InputProps={{
-//                 startAdornment: <Lock size={20} style={{ marginRight: 8, color: '#666' }} />,
-//               }}
-//             />
-
-//             <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-//               <Button
-//                 variant={userType === 'seeker' ? 'contained' : 'outlined'}
-//                 onClick={() => setUserType('seeker')}
-//               >
-//                 Job Seeker
-//               </Button>
-//               <Button
-//                 variant={userType === 'hirer' ? 'contained' : 'outlined'}
-//                 onClick={() => setUserType('hirer')}
-//               >
-//                 Hiring Manager
-//               </Button>
-//             </Box>
-
-//             <Button
-//               type="submit"
-//               fullWidth
-//               variant="contained"
-//               color="primary"
-//               sx={{ mt: 4, py: 1.5 }}
-//             >
-//               Register
-//             </Button>
-
-//             <Box sx={{ textAlign: 'center', mt: 2 }}>
-//               <Typography variant="body2">
-//                 Already have an account?{' '}
-//                 <Link href="/login" variant="body2" sx={{ fontWeight: 'medium' }}>
-//                   Login
-//                 </Link>
-//               </Typography>
-//             </Box>
-//           </Box>
-//         </Paper>
-//       </Box>
-//     </Container>
-//   );
-// };
-
-// export default Register;
-
 import React, { useState } from 'react';
 import {
   Box,
@@ -172,6 +17,7 @@ import {
 import { User, Mail, Lock, Eye, EyeOff, Users, Shield, Briefcase, UserCheck } from 'lucide-react';
 import logo from '../assets/logo.png';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
+import { registerUserAPI } from '../api/authApi';
 
 const Register = () => {
   const [name, setName] = useState('');
@@ -203,30 +49,12 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('https://hirehubbackend-5.onrender.com/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          name,
-          Emailid,
-          password,
-          userType
-        })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess('Registration successful. You can now log in.');
-        setTimeout(() => navigate('/'), 2000);
-      } else {
-        setError(data.message || 'Registration failed');
-      }
+      await registerUserAPI({ name, Emailid, password, userType });
+      setSuccess('Registration successful. You can now log in.');
+      setTimeout(() => navigate('/'), 2000);
     } catch (err) {
-      console.error(err);
-      setError('Something went wrong. Please try again.');
+      const msg = err?.response?.data?.message || 'Registration failed';
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -234,62 +62,62 @@ const Register = () => {
 
   // Illustration Component
   const RegisterIllustration = () => (
-    <Box sx={{ 
-      display: 'flex', 
-      alignItems: 'center', 
+    <Box sx={{
+      display: 'flex',
+      alignItems: 'center',
       justifyContent: 'center',
       height: '100%',
       minHeight: 400
     }}>
-      <svg 
-        width="300" 
-        height="300" 
-        viewBox="0 0 300 300" 
-        fill="none" 
+      <svg
+        width="300"
+        height="300"
+        viewBox="0 0 300 300"
+        fill="none"
         xmlns="http://www.w3.org/2000/svg"
       >
         {/* Background Circle */}
-        <circle 
-          cx="150" 
-          cy="150" 
-          r="140" 
-          fill={`url(#gradient1)`} 
+        <circle
+          cx="150"
+          cy="150"
+          r="140"
+          fill={`url(#gradient1)`}
           opacity="0.1"
         />
-        
+
         {/* Person 1 */}
-        <circle cx="120" cy="80" r="25" fill={theme.palette.primary.main} opacity="0.8"/>
-        <rect x="100" y="100" width="40" height="60" rx="20" fill={theme.palette.primary.main} opacity="0.6"/>
-        
+        <circle cx="120" cy="80" r="25" fill={theme.palette.primary.main} opacity="0.8" />
+        <rect x="100" y="100" width="40" height="60" rx="20" fill={theme.palette.primary.main} opacity="0.6" />
+
         {/* Person 2 */}
-        <circle cx="180" cy="80" r="25" fill={theme.palette.secondary.main} opacity="0.8"/>
-        <rect x="160" y="100" width="40" height="60" rx="20" fill={theme.palette.secondary.main} opacity="0.6"/>
-        
+        <circle cx="180" cy="80" r="25" fill={theme.palette.secondary.main} opacity="0.8" />
+        <rect x="160" y="100" width="40" height="60" rx="20" fill={theme.palette.secondary.main} opacity="0.6" />
+
         {/* Handshake/Connection */}
-        <path 
-          d="M140 120 L160 120" 
-          stroke={theme.palette.primary.main} 
-          strokeWidth="4" 
+        <path
+          d="M140 120 L160 120"
+          stroke={theme.palette.primary.main}
+          strokeWidth="4"
           strokeLinecap="round"
         />
-        
+
         {/* Building/Company */}
-        <rect x="110" y="180" width="80" height="60" fill={theme.palette.grey[300]} opacity="0.7"/>
-        <rect x="120" y="190" width="15" height="15" fill={theme.palette.primary.main} opacity="0.5"/>
-        <rect x="135" y="190" width="15" height="15" fill={theme.palette.secondary.main} opacity="0.5"/>
-        <rect x="155" y="190" width="15" height="15" fill={theme.palette.primary.main} opacity="0.5"/>
-        <rect x="170" y="190" width="15" height="15" fill={theme.palette.secondary.main} opacity="0.5"/>
-        
+        <rect x="110" y="180" width="80" height="60" fill={theme.palette.grey[300]} opacity="0.7" />
+        <rect x="120" y="190" width="15" height="15" fill={theme.palette.primary.main} opacity="0.5" />
+        <rect x="135" y="190" width="15" height="15" fill={theme.palette.secondary.main} opacity="0.5" />
+        <rect x="155" y="190" width="15" height="15" fill={theme.palette.primary.main} opacity="0.5" />
+        <rect x="170" y="190" width="15" height="15" fill={theme.palette.secondary.main} opacity="0.5" />
+
         {/* Briefcase */}
-        <rect x="130" y="250" width="40" height="25" rx="5" fill={theme.palette.primary.main} opacity="0.7"/>
-        <rect x="145" y="245" width="10" height="5" fill={theme.palette.primary.dark}/>
-        
+        <rect x="130" y="250" width="40" height="25" rx="5" fill={theme.palette.primary.main} opacity="0.7" />
+        <rect x="145" y="245" width="10" height="5" fill={theme.palette.primary.dark} />
+
         {/* Floating Elements */}
-        <circle cx="70" cy="100" r="3" fill={theme.palette.primary.main} opacity="0.6"/>
-        <circle cx="230" cy="120" r="4" fill={theme.palette.secondary.main} opacity="0.6"/>
-        <circle cx="80" cy="180" r="2" fill={theme.palette.primary.main} opacity="0.8"/>
-        <circle cx="220" cy="180" r="3" fill={theme.palette.secondary.main} opacity="0.7"/>
-        
+        <circle cx="70" cy="100" r="3" fill={theme.palette.primary.main} opacity="0.6" />
+        <circle cx="230" cy="120" r="4" fill={theme.palette.secondary.main} opacity="0.6" />
+        <circle cx="80" cy="180" r="2" fill={theme.palette.primary.main} opacity="0.8" />
+        <circle cx="220" cy="180" r="3" fill={theme.palette.secondary.main} opacity="0.7" />
+
         <defs>
           <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor={theme.palette.primary.main} />
@@ -303,7 +131,7 @@ const Register = () => {
   return (
     <Box sx={{ minHeight: '100vh', position: 'relative' }}>
       {/* Logo at top left */}
-      <Box sx={{ 
+      <Box sx={{
         position: 'absolute',
         top: 2,
         left: 24,
@@ -312,7 +140,7 @@ const Register = () => {
         <img
           src={logo}
           alt="HireHub Logo"
-          style={{ 
+          style={{
             width: "170px",
             height: "auto",
             filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
@@ -321,16 +149,16 @@ const Register = () => {
       </Box>
 
       <Container maxWidth="lg">
-        <Box sx={{ 
+        <Box sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
           minHeight: '95vh',
           py: 4
         }}>
-          <Paper 
-            elevation={8} 
-            sx={{ 
+          <Paper
+            elevation={8}
+            sx={{
               borderRadius: 3,
               background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.02)} 0%, ${alpha(theme.palette.secondary.main, 0.02)} 100%)`,
               backdropFilter: 'blur(10px)',
@@ -342,7 +170,7 @@ const Register = () => {
           >
             <Grid container spacing={2} direction="row">
               {/* Left Side - Illustration */}
-              <Grid size={{xs:12, md:5}} sx={{ 
+              <Grid size={{ xs: 12, md: 5 }} sx={{
                 display: { xs: 'none', md: 'flex' },
                 background: `linear-gradient(135deg, ${alpha(theme.palette.primary.main, 0.05)} 0%, ${alpha(theme.palette.secondary.main, 0.05)} 100%)`,
                 alignItems: 'center',
@@ -352,14 +180,14 @@ const Register = () => {
                 <Box>
                   <RegisterIllustration />
                   <Box sx={{ textAlign: 'center', mt: 2 }}>
-                    <Typography variant="h6" sx={{ 
+                    <Typography variant="h6" sx={{
                       fontWeight: 600,
                       color: 'text.primary',
                       mb: 1
                     }}>
                       Join HireHub Today
                     </Typography>
-                    <Typography variant="body2" sx={{ 
+                    <Typography variant="body2" sx={{
                       color: 'text.secondary',
                       maxWidth: 250,
                       mx: 'auto',
@@ -372,14 +200,14 @@ const Register = () => {
               </Grid>
 
               {/* Right Side - Form */}
-              <Grid size={{xs:12, md:7}}>
+              <Grid size={{ xs: 12, md: 7 }}>
                 <Box sx={{ p: { xs: 3, sm: 4, md: 5 } }}>
                   {/* Register Header */}
                   <Box sx={{ mb: 3 }}>
-                    <Typography 
-                      variant="h5" 
-                      component="h1" 
-                      sx={{ 
+                    <Typography
+                      variant="h5"
+                      component="h1"
+                      sx={{
                         fontWeight: 600,
                         color: 'text.primary',
                         textAlign: 'left',
@@ -388,9 +216,9 @@ const Register = () => {
                     >
                       Create Account
                     </Typography>
-                    <Typography 
-                      variant="body2" 
-                      sx={{ 
+                    <Typography
+                      variant="body2"
+                      sx={{
                         color: 'text.secondary'
                       }}
                     >
@@ -400,9 +228,9 @@ const Register = () => {
 
                   {/* Alerts */}
                   {error && (
-                    <Alert 
-                      severity="error" 
-                      sx={{ 
+                    <Alert
+                      severity="error"
+                      sx={{
                         mb: 3,
                         borderRadius: 2,
                         '& .MuiAlert-icon': {
@@ -414,9 +242,9 @@ const Register = () => {
                     </Alert>
                   )}
                   {success && (
-                    <Alert 
-                      severity="success" 
-                      sx={{ 
+                    <Alert
+                      severity="success"
+                      sx={{
                         mb: 3,
                         borderRadius: 2,
                         '& .MuiAlert-icon': {
@@ -437,7 +265,7 @@ const Register = () => {
                       label="Full Name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      sx={{ 
+                      sx={{
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
@@ -466,7 +294,7 @@ const Register = () => {
                       type="email"
                       value={Emailid}
                       onChange={(e) => setEmail(e.target.value)}
-                      sx={{ 
+                      sx={{
                         mb: 2,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
@@ -495,7 +323,7 @@ const Register = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      sx={{ 
+                      sx={{
                         mb: 3,
                         '& .MuiOutlinedInput-root': {
                           borderRadius: 2,
@@ -519,7 +347,7 @@ const Register = () => {
                               aria-label="toggle password visibility"
                               onClick={handleClickShowPassword}
                               edge="end"
-                              sx={{ 
+                              sx={{
                                 color: theme.palette.text.secondary,
                                 '&:hover': {
                                   color: theme.palette.primary.main,
@@ -536,8 +364,8 @@ const Register = () => {
 
                     {/* User Type Selection */}
                     <Box sx={{ mb: 3 }}>
-                      <Typography variant="body2" sx={{ 
-                        color: 'text.secondary', 
+                      <Typography variant="body2" sx={{
+                        color: 'text.secondary',
                         mb: 1.5,
                         fontWeight: 500
                       }}>
@@ -595,8 +423,8 @@ const Register = () => {
                       fullWidth
                       variant="contained"
                       disabled={isLoading}
-                      sx={{ 
-                        mb: 3, 
+                      sx={{
+                        mb: 3,
                         py: 1.5,
                         borderRadius: 2,
                         fontSize: '1.1rem',
@@ -624,11 +452,11 @@ const Register = () => {
                     <Box sx={{ textAlign: 'center' }}>
                       <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                         Already have an account?{' '}
-                        <Link 
-                          component={RouterLink} 
-                          to="/" 
-                          variant="body2" 
-                          sx={{ 
+                        <Link
+                          component={RouterLink}
+                          to="/"
+                          variant="body2"
+                          sx={{
                             fontWeight: 600,
                             color: theme.palette.primary.main,
                             textDecoration: 'none',

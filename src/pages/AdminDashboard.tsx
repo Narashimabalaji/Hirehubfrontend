@@ -5,7 +5,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 
-const BASE_URL = 'https://hirehubbackend-5.onrender.com';
+const BASE_URL = process.env.REACT_APP_BASE_URL;
 
 interface Job {
   _id: string;

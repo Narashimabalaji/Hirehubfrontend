@@ -27,6 +27,7 @@ import {
   Bot,
   User,
 } from "lucide-react";
+import { sendChatMessageAPI } from '../api/chatApi';
 
 const NavaBot = () => {
   const [open, setOpen] = useState(false);
@@ -87,7 +88,7 @@ const NavaBot = () => {
   };
 
 
-   const sendMessage = async () => {
+  const sendMessage = async () => {
     if (!question.trim()) return;
 
     const userMessage = { from: "user", text: question };
@@ -96,35 +97,7 @@ const NavaBot = () => {
     setTyping(true);
 
     try {
-      const token = localStorage.getItem("access_token");
-
-      let res, data;
-
-      if (resumeFile) {
-        const formData = new FormData();
-        formData.append("question", question);
-        formData.append("resume", resumeFile);
-
-        res = await fetch("https://hirehubbackend-5.onrender.com/upload_resume_and_chat", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
-      } else {
-        res = await fetch("https://hirehubbackend-5.onrender.com/chat", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ question }),
-        });
-      }
-
-      data = await res.json();
-
+      const data = await sendChatMessageAPI({ question, resumeFile });
       const botMessage = { from: "bot", text: data.response || "No response." };
       setMessages((prev) => [...prev, botMessage]);
     } catch (err) {
@@ -136,7 +109,6 @@ const NavaBot = () => {
 
     setTyping(false);
 
-    // If they asked about the resume, reset the awaiting state after first question
     if (resumeFile) {
       clearResume();
       setAwaitingQuestion(false);
@@ -144,65 +116,65 @@ const NavaBot = () => {
   };
 
   const MessageBubble = ({ message, index }) => (
+    <Box
+      sx={{
+        display: "flex",
+        justifyContent: message.from === "user" ? "flex-end" : "flex-start",
+        mb: 2,
+        alignItems: "flex-start"
+      }}
+    >
+
       <Box
         sx={{
-          display: "flex",
-          justifyContent: message.from === "user" ? "flex-end" : "flex-start",
-          mb: 2,
-          alignItems: "flex-start"
+          maxWidth: "75%",
+          position: "relative",
         }}
       >
-        
-        <Box
+        <Paper
+          elevation={message.from === "system" ? 0 : 2}
           sx={{
-            maxWidth: "75%",
+            p: 1.5,
+            borderRadius: 2,
+            bgcolor: message.from === "user"
+              ? "primary.main"
+              : message.from === "bot"
+                ? "grey.50"
+                : "info.50",
+            color: message.from === "user" ? "white" : "text.primary",
+            border: message.from === "system" ? "1px solid" : "none",
+            borderColor: message.from === "system" ? "info.200" : "transparent",
             position: "relative",
+
           }}
         >
-          <Paper
-            elevation={message.from === "system" ? 0 : 2}
+          <Typography
+            variant="body2"
             sx={{
-              p: 1.5,
-              borderRadius: 2,
-              bgcolor: message.from === "user" 
-                ? "primary.main" 
-                : message.from === "bot" 
-                ? "grey.50" 
-                : "info.50",
-              color: message.from === "user" ? "white" : "text.primary",
-              border: message.from === "system" ? "1px solid" : "none",
-              borderColor: message.from === "system" ? "info.200" : "transparent",
-              position: "relative",
-              
+              whiteSpace: "pre-wrap",
+              fontStyle: message.from === "system" ? "italic" : "normal",
+              lineHeight: 1.4,
             }}
           >
-            <Typography
-              variant="body2"
-              sx={{
-                whiteSpace: "pre-wrap",
-                fontStyle: message.from === "system" ? "italic" : "normal",
-                lineHeight: 1.4,
-              }}
-            >
-              {message.text}
-            </Typography>
-          </Paper>
-        </Box>
-
-        {message.from === "user" && (
-          <Avatar
-            sx={{
-              bgcolor: "secondary.main",
-              width: 28,
-              height: 28,
-              ml: 1,
-              mb: 0.5,
-            }}
-          >
-            <User size={16} />
-          </Avatar>
-        )}
+            {message.text}
+          </Typography>
+        </Paper>
       </Box>
+
+      {message.from === "user" && (
+        <Avatar
+          sx={{
+            bgcolor: "secondary.main",
+            width: 28,
+            height: 28,
+            ml: 1,
+            mb: 0.5,
+          }}
+        >
+          <User size={16} />
+        </Avatar>
+      )}
+    </Box>
   );
 
   const TypingIndicator = () => (
@@ -275,7 +247,7 @@ const NavaBot = () => {
             >
               <MessageCircle size={28} />
             </IconButton>
-            
+
             {/* Online indicator */}
             <Box
               sx={{
@@ -331,12 +303,12 @@ const NavaBot = () => {
                   <Typography variant="h6" fontWeight="bold">
                     Nava
                   </Typography>
-                  <Typography variant="caption" sx={{ opacity: 0.8, fontWeight:600 }}>
+                  <Typography variant="caption" sx={{ opacity: 0.8, fontWeight: 600 }}>
                     AI Assistant • Online
                   </Typography>
                 </Box>
               </Box>
-              
+
               <IconButton
                 onClick={toggleChat}
                 sx={{
@@ -377,15 +349,15 @@ const NavaBot = () => {
               {messages.map((message, index) => (
                 <MessageBubble key={index} message={message} index={index} />
               ))}
-              
+
               {typing && <TypingIndicator />}
-              
+
               {loading && !typing && (
                 <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
                   <CircularProgress size={24} />
                 </Box>
               )}
-              
+
               <div ref={messagesEndRef} />
             </Box>
 

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { uploadResumeAPI } from '../api/jobAPi';
 
 function ApplyJobPage() {
   const { jobId } = useParams();
@@ -17,6 +18,7 @@ function ApplyJobPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+  
     if (!name || !email || !resumeFile) {
       setMessage('Please fill all fields and upload resume');
       return;
@@ -25,37 +27,19 @@ function ApplyJobPage() {
     setLoading(true);
     setMessage('');
   
-    const formData = new FormData();
-    formData.append('name', name);
-    formData.append('email', email);
-    formData.append('resume', resumeFile);
-  
-    const token = localStorage.getItem('access_token');
-  
     try {
-      const res = await fetch(`https://hirehubbackend-5.onrender.com/upload_resume/${jobId}`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        body: formData
-      });
-  
-      const data = await res.json();
-      if (res.ok) {
-        setMessage('Application submitted successfully!');
-        setTimeout(() => navigate('/'), 2000);
-      } else {
-        setMessage(data.error || 'Failed to submit application');
-      }
+      const data = await uploadResumeAPI(jobId, { name, email, resumeFile });
+      setMessage('Application submitted successfully!');
+      setTimeout(() => navigate('/'), 2000);
     } catch (error) {
-      setMessage('An error occurred while submitting your application.');
+      const errorMsg =
+        error?.response?.data?.error || 'Failed to submit application';
+      setMessage(errorMsg);
     } finally {
       setLoading(false);
     }
   };
   
-
   return (
     <div style={{ maxWidth: 500, margin: 'auto', padding: '1rem' }}>
       <h2>Apply for Job</h2>

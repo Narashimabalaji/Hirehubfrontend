@@ -27,12 +27,15 @@ import {
     User as UserIcon,
 } from 'lucide-react';
 import { Outlet, useNavigate } from 'react-router-dom';
+import { useAuth } from '../../store/auth';
 
 const AppLayout = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [user, setUser] = useState(null);
     const theme = useTheme();
     const navigate = useNavigate();
+
+    const { logout } = useAuth();
 
     useEffect(() => {
         const storedUser = JSON.parse(localStorage.getItem("user"));
@@ -41,13 +44,6 @@ const AppLayout = () => {
 
     const toggleMobileMenu = () => {
         setMobileMenuOpen(!mobileMenuOpen);
-    };
-
-    const handleLogout = () => {
-        localStorage.removeItem('access_token');
-        localStorage.removeItem('refresh_token');
-        localStorage.removeItem('user');
-        navigate('/');
     };
 
     const userType = user?.userType;
@@ -78,7 +74,7 @@ const AppLayout = () => {
                     <Box sx={{ ml: 6, display: { xs: 'none', md: 'flex' }, alignItems: 'center' }}>
                         <Button
                             startIcon={<Home />}
-                            onClick={() => navigate('/dashboard')}
+                            onClick={() => navigate('/home')}
                             sx={{
                                 mr: 1,
                                 color: 'primary.main',
@@ -96,7 +92,7 @@ const AppLayout = () => {
                                 transition: 'all 0.2s ease-in-out'
                             }}
                         >
-                            Dashboard
+                            Home
                         </Button>
 
                         {userType === 'hirer' ? (
@@ -180,13 +176,13 @@ const AppLayout = () => {
                             size="small"
                             sx={{
                                 borderRadius: 2,
-                                px:0,
+                                px: 0,
                                 py: 1,
                                 textTransform: 'none',
                                 fontWeight: 600,
                                 transition: 'all 0.2s ease-in-out'
                             }}
-                            onClick={handleLogout}
+                            onClick={logout}
                         >
                             <LogoutIcon size={20} />
                         </Button>
@@ -259,7 +255,7 @@ const AppLayout = () => {
                         <ListItem disablePadding sx={{ mb: 1 }}>
                             <ListItemButton
                                 selected
-                                onClick={() => { navigate('/dashboard'); toggleMobileMenu(); }}
+                                onClick={() => { navigate('/home'); toggleMobileMenu(); }}
                                 sx={{
                                     borderRadius: 2,
                                     py: 1.5,
@@ -280,7 +276,7 @@ const AppLayout = () => {
                                     <Home color="primary" />
                                 </ListItemIcon>
                                 <ListItemText
-                                    primary="Dashboard"
+                                    primary="Home"
                                     primaryTypographyProps={{
                                         fontWeight: 600,
                                         color: 'primary.main'
@@ -343,7 +339,7 @@ const AppLayout = () => {
                                 transition: 'all 0.2s ease-in-out'
                             }}
                             onClick={() => {
-                                handleLogout();
+                                logout();
                                 toggleMobileMenu();
                             }}
                         >
