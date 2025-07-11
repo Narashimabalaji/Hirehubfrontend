@@ -101,15 +101,19 @@ const JobFeed = () => {
   const [userType, setUserType] = useState('');
 
   const formatDate = (dateStr) => {
-    const [day, month, year] = dateStr.split('/');
-    const date = new Date(`${year}-${month}-${day}`);
-
+    if (!dateStr) return "Unknown Date";
+  
+    const date = new Date(dateStr);
+  
+    if (isNaN(date.getTime())) return "Unknown Date";
+  
     return date.toLocaleDateString('en-GB', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
-    }).replace(' ', ' ').replace(' ', ', ');
+    }); // e.g., "11 Jul 2025"
   };
+
 
   useEffect(() => {
     const storedType = localStorage.getItem('userType');
