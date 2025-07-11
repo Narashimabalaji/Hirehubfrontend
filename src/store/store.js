@@ -19,7 +19,7 @@ const useStore = create((set, get) => ({
       const formatted = data.map((job) => ({
         id: job.id,
         title: job.title,
-        company: job.company_name,
+        company: job.company,
         description: job.description,
         location: job.location,
         salary:job.salary,
