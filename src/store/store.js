@@ -17,19 +17,7 @@ const useStore = create((set, get) => ({
       const data = await fetchJobsAPI();
 
       const formatted = data.map((job) => ({
-        const postedDate = "Unknown Date";
-        if (job.created_at) {
-        const [day, month, year] = job.created_at.split("-");
-        if (day && month && year) {
-          const date = new Date(`${year}-${month}-${day}`);
-          postedDate = date.toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          });
-        }
-      }
-        
+
         id: job.id,
         title: job.title,
         company: job.company,
