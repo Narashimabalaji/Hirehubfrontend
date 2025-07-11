@@ -17,7 +17,7 @@ const useStore = create((set, get) => ({
       const data = await fetchJobsAPI();
 
       const formatted = data.map((job) => ({
-        let postedDate = "Unknown Date";
+        const postedDate = "Unknown Date";
         if (job.created_at) {
         const [day, month, year] = job.created_at.split("-");
         if (day && month && year) {
