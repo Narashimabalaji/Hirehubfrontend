@@ -714,7 +714,7 @@ const HirerJobPost = () => {
     if (!validateForm()) return;
 
     const token = localStorage.getItem('access_token');
-    const hirerId = localStorage.getItem('userId');
+    const hirerId = localStorage.getItem('userType');
     const emailid = formData.hireremailid;
 
     if (!token || !hirerId) {
