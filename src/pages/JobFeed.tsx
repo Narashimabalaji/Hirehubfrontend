@@ -102,18 +102,21 @@ const JobFeed = () => {
   const { userType } = useAuth();
 
   const formatDate = (dateStr) => {
-    const [day, month, year] = dateStr.split('/');
-    const date = new Date(`${year}-${month}-${day}`);
+    if (!dateStr) return "Unknown Date";
+
+    const date = new Date(dateStr);
+
+    if (isNaN(date.getTime())) return "Unknown Date";
 
     return date.toLocaleDateString('en-GB', {
       day: '2-digit',
       month: 'short',
       year: 'numeric'
-    }).replace(' ', ' ').replace(' ', ', ');
+    }); // e.g., "11 Jul 2025"
   };
 
   return (
-    <Box sx={{ width: '100%', px: 0, py:{ xs:0, md:2} }}>
+    <Box sx={{ width: '100%', px: 0, py: { xs: 0, md: 2 } }}>
       <Grid container spacing={3}>
         {/* Left Sidebar - Filters */}
         <Grid size={{ xs: 12, md: 3 }}>
