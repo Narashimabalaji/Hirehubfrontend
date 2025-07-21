@@ -8,27 +8,26 @@ import HirerJobPost from './components/HirerJobPost';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
-import { AuthProvider } from './store/auth';
+import HirerJobPosts from './pages/hirer/MyJobPosts'
 
 
 const App = () => {
   return (
     <Router>
-      <AuthProvider>
-        <Routes>
-          <Route path='/' element={<Login />} />
-          <Route path='/register' element={<Register />} />
-          <Route element={<ProtectedRoute>
-            <AppLayout />
-          </ProtectedRoute>
-          }>
-            <Route path='/home' element={<JobFeed />} />
-            <Route path="/hirer/job-post" element={<HirerJobPost />} />
-            <Route path="/admin" element={<AdminDashboard />} />
-            <Route path='/apply/:jobId' element={<ApplyJobPage />} />
-          </Route>
-        </Routes>
-      </AuthProvider>
+      <Routes>
+        <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
+        <Route element={<ProtectedRoute>
+          <AppLayout />
+        </ProtectedRoute>
+        }>
+          <Route path='/' element={<JobFeed />} />
+          <Route path="/job-post" element={<HirerJobPost />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path='/apply/:jobId' element={<ApplyJobPage />} />
+          <Route path='/my-posts' element={<HirerJobPosts />} />
+        </Route>
+      </Routes>
     </Router>
   );
 };
