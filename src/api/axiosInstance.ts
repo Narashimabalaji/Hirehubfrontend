@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { callLogout } from '../store/authRef';
 
 const baseURL = process.env.REACT_APP_BASE_URL;
 
@@ -45,7 +46,7 @@ axiosInstance.interceptors.response.use(
         }
       } catch (err) {
         console.error("Token refresh failed", err);
-        // You may want to log out user here
+        callLogout();
       }
     }
 

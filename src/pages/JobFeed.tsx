@@ -32,6 +32,7 @@ import {
 import useStore from '../store/store';
 import NavaBot from '../components/NavaBot';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
+import { useAuth } from '../store/auth';
 
 const JobFeed = () => {
   const theme = useTheme();
@@ -98,7 +99,7 @@ const JobFeed = () => {
     }
   };
 
-  const [userType, setUserType] = useState('');
+  const { userType } = useAuth();
 
   const formatDate = (dateStr) => {
     const [day, month, year] = dateStr.split('/');
@@ -111,13 +112,8 @@ const JobFeed = () => {
     }).replace(' ', ' ').replace(' ', ', ');
   };
 
-  useEffect(() => {
-    const storedType = localStorage.getItem('userType');
-    if (storedType) setUserType(storedType);
-  }, []);
-
   return (
-    <Box sx={{ width: '100%', px: 0, py: 3 }}>
+    <Box sx={{ width: '100%', px: 0, py:{ xs:0, md:2} }}>
       <Grid container spacing={3}>
         {/* Left Sidebar - Filters */}
         <Grid size={{ xs: 12, md: 3 }}>
@@ -284,7 +280,7 @@ const JobFeed = () => {
                   <Button
                     variant="contained"
                     fullWidth={isMobile}
-                    onClick={() => navigate('/hirer/job-post')}
+                    onClick={() => navigate('/job-post')}
                     sx={{
                       borderRadius: 2,
                       bgcolor: "#36a9e4",

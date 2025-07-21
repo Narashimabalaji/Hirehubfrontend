@@ -454,7 +454,7 @@ const Register = () => {
                         Already have an account?{' '}
                         <Link
                           component={RouterLink}
-                          to="/"
+                          to="/login"
                           variant="body2"
                           sx={{
                             fontWeight: 600,

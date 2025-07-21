@@ -37,9 +37,12 @@ const Login = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/home');
+      navigate('/');
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => console.log(error)
+  ,[error])
 
   const theme = useTheme();
 
@@ -66,13 +69,12 @@ const Login = () => {
     try {
       await login(Emailid, password, role, setError, setIsLoading);
       setIsLoading(false);
-      navigate('/home');
+      navigate('/');
     }
     catch (err) {
-      setError('Invalid email or password');
       setIsLoading(false);
+      // setError('Invalid email or password'); 
     }
-
   };
 
   const tabStyles = {
