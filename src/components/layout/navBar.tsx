@@ -119,7 +119,7 @@ const NavBar = () => {
                                 startIcon={<BusinessCenterOutlinedIcon />}
                                 onClick={() => navigate('/my-jobs')}
                                 sx={{
-                                    color: isActive('/') ? 'secondary.main' : 'text.secondary',
+                                    color: isActive('/my-jobs') ? 'secondary.main' : 'text.secondary',
                                     borderRadius: 2,
                                     px: 2,
                                     py: 1,
