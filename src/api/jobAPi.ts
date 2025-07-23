@@ -59,6 +59,11 @@ const jobAPI = {
 
     return response.data;
   },
+
+  fetchJobDetails: async (jobId) => {
+    const response = await axiosInstance.get(`/particularjob/${jobId}`);
+    return response.data;
+  }
 };
 
 export default jobAPI;

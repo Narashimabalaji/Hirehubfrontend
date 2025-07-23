@@ -3,12 +3,13 @@ import './index.css';
 import Login from './pages/Login';
 import AppLayout from './components/layout/AppLayout';
 import JobFeed from './pages/JobFeed';
-import ApplyJobPage from './components/ApplyJobPage';
+import ApplyJobPage from './pages/JobDetail/ApplyJobPage';
 import HirerJobPost from './components/HirerJobPost';
 import Register from './pages/Register';
 import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import HirerJobPosts from './pages/hirer/MyJobPosts'
+import JobDetailView from './pages/JobDetail/JobDetail';
 
 
 const App = () => {
@@ -24,7 +25,8 @@ const App = () => {
           <Route path='/' element={<JobFeed />} />
           <Route path="/job-post" element={<HirerJobPost />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path='/apply/:jobId' element={<ApplyJobPage />} />
+          <Route path='/job/:jobId' element={<JobDetailView />} />
+          <Route path='/job/apply/:jobId' element={<ApplyJobPage />} />
           <Route path='/my-posts' element={<HirerJobPosts />} />
         </Route>
       </Routes>

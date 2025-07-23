@@ -15,6 +15,7 @@ import {
   Chip,
   Divider,
   Alert,
+  useTheme,
 } from "@mui/material";
 import {
   MessageCircle,
@@ -45,6 +46,8 @@ const NavaBot = () => {
 
   const fileInputRef = useRef();
   const messagesEndRef = useRef(null);
+
+  const theme = useTheme();
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -405,7 +408,7 @@ const NavaBot = () => {
                                 "&:hover": { bgcolor: "primary.50" },
                               }}
                             >
-                              <Paperclip size={18} />
+                              <Paperclip size={12} />
                             </IconButton>
                           </Tooltip>
                         </Box>
@@ -423,6 +426,7 @@ const NavaBot = () => {
                     height: 40,
                     borderRadius: 2,
                     boxShadow: "none",
+                    background: theme.palette.secondary.main,
                     "&:hover": { boxShadow: "0 4px 12px rgba(0,0,0,0.15)" },
                   }}
                 >

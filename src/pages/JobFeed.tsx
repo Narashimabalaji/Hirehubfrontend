@@ -334,13 +334,14 @@ const JobFeed = () => {
                   {filteredJobs.map((job, index) => {
                     // Define color variants for different cards
                     const cardColors = [
-                      { bg: '#FFF3E0', accent: '#FF9800', company: '#E65100' }, // Orange
-                      { bg: '#E8F5E8', accent: '#4CAF50', company: '#2E7D32' }, // Green
-                      { bg: '#F3E5F5', accent: '#9C27B0', company: '#6A1B9A' }, // Purple
-                      { bg: '#E3F2FD', accent: '#2196F3', company: '#1565C0' }, // Blue
-                      { bg: '#FCE4EC', accent: '#E91E63', company: '#AD1457' }, // Pink
-                      { bg: '#FFF8E1', accent: '#FFC107', company: '#F57F17' }, // Amber
-                    ];
+                      { bg: '#FFF3E0', accent: '#FF9800', company: '#FB8C00' }, // Orange (lighter company)
+                      { bg: '#E8F5E9', accent: '#4CAF50', company: '#43A047' }, // Green
+                      { bg: '#F3E5F5', accent: '#9C27B0', company: '#8E24AA' }, // Purple
+                      { bg: '#E3F2FD', accent: '#2196F3', company: '#1E88E5' }, // Blue
+                      { bg: '#FCE4EC', accent: '#E91E63', company: '#D81B60' }, // Pink
+                      { bg: '#FFF8E1', accent: '#FFC107', company: '#FFB300' }, // Amber
+                    ]
+
 
                     const colorScheme = cardColors[index % cardColors.length];
 
@@ -535,7 +536,7 @@ const JobFeed = () => {
                               </Box>
                               <Button
                                 variant="contained"
-                                onClick={() => navigate(`/apply/${job.id}`)}
+                                onClick={() => navigate(`/job/${job.id}`)}
                                 sx={{
                                   bgcolor: 'rgba(0,0,0,0.8)',
                                   color: 'white',

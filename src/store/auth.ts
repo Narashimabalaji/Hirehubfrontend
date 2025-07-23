@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { createJSONStorage } from 'zustand/middleware';
-import { useNavigate } from 'react-router-dom';
+import { setLogout } from './authRef';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -70,7 +70,7 @@ export const useAuth = create<AuthState>()(
         localStorage.removeItem('refresh_token');
         localStorage.removeItem('access_token');
 
-        // optionally redirect manually (outside store)
+        window.location.href = '/login'
       },
     }),
     {
@@ -85,3 +85,5 @@ export const useAuth = create<AuthState>()(
     }
   )
 );
+
+setLogout(() => useAuth.getState().logout());

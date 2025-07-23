@@ -83,6 +83,7 @@ const NavBar = () => {
                                 fontWeight: 600,
                                 textTransform: 'none',
                                 '&:hover': {
+                                    color: 'primary.main',
                                     bgcolor: 'primary.100',
                                     transform: 'translateY(-1px)',
                                 },

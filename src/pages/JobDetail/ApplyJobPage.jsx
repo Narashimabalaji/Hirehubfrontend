@@ -1,87 +1,3 @@
-// import React, { useState } from 'react';
-// import { useParams, useNavigate } from 'react-router-dom';
-// import { uploadResumeAPI } from '../api/jobAPi';
-
-// function ApplyJobPage() {
-//   const { jobId } = useParams();
-//   const navigate = useNavigate();
-
-//   const [name, setName] = useState('');
-//   const [email, setEmail] = useState('');
-//   const [resumeFile, setResumeFile] = useState(null);
-//   const [loading, setLoading] = useState(false);
-//   const [message, setMessage] = useState('');
-
-//   const handleFileChange = (e) => {
-//     setResumeFile(e.target.files[0]);
-//   };
-
-//   const handleSubmit = async (e) => {
-//     e.preventDefault();
-
-//     if (!name || !email || !resumeFile) {
-//       setMessage('Please fill all fields and upload resume');
-//       return;
-//     }
-
-//     setLoading(true);
-//     setMessage('');
-
-//     try {
-//       const data = await uploadResumeAPI(jobId, { name, email, resumeFile });
-//       setMessage('Application submitted successfully!');
-//       setTimeout(() => navigate('/'), 2000);
-//     } catch (error) {
-//       const errorMsg =
-//         error?.response?.data?.error || 'Failed to submit application';
-//       setMessage(errorMsg);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div style={{ maxWidth: 500, margin: 'auto', padding: '1rem' }}>
-//       <h2>Apply for Job</h2>
-//       <form onSubmit={handleSubmit}>
-//         <div style={{ marginBottom: '1rem' }}>
-//           <label>Name:</label><br />
-//           <input
-//             type="text"
-//             value={name}
-//             onChange={e => setName(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div style={{ marginBottom: '1rem' }}>
-//           <label>Email:</label><br />
-//           <input
-//             type="email"
-//             value={email}
-//             onChange={e => setEmail(e.target.value)}
-//             required
-//           />
-//         </div>
-//         <div style={{ marginBottom: '1rem' }}>
-//           <label>Resume (PDF or DOC):</label><br />
-//           <input
-//             type="file"
-//             accept=".pdf,.doc,.docx"
-//             onChange={handleFileChange}
-//             required
-//           />
-//         </div>
-//         <button type="submit" disabled={loading}>
-//           {loading ? 'Submitting...' : 'Submit Application'}
-//         </button>
-//       </form>
-//       {message && <p>{message}</p>}
-//     </div>
-//   );
-// }
-
-// export default ApplyJobPage;
-
 import React, { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
@@ -112,13 +28,14 @@ import {
   ErrorOutline
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
-import jobAPI from '../api/jobAPi';
+import jobAPI from '../../api/jobAPi';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: theme.spacing(2),
   background: "transparent",
-  minWidth: "60vw"
+  maxWidth: "60vw",
+  margin: "0 auto"
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -248,48 +165,53 @@ function ApplyJobPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ display: "flex", justifyContent: "center" }}>
-      <Box sx={{ mb: 3, position: "absolute" }}>
-        <Tooltip title="Go back">
-          <IconButton
-            onClick={() => navigate(-1)}
-            sx={{
-              color: '#36a9e4',
-              mb: 2,
-              '&:hover': {
-                backgroundColor: 'rgba(54, 169, 228, 0.1)'
-              }
-            }}
-          >
-            <ArrowBack />
-          </IconButton>
-        </Tooltip>
-      </Box>
-
+    <Container maxWidth="xl" sx={{ position: "relative", px: 3 }}>
+      {/* Back Button - Positioned absolutely to the left */}
       <StyledPaper elevation={0}>
-        <Box sx={{ textAlign: 'center', mb: 4 }}>
-          <Typography
-            variant="h4"
-            component="h1"
-            sx={{
-              color: '#00254e',
-              fontWeight: 700,
-              mb: 1
-            }}
-          >
-            Apply for Position
-          </Typography>
-          <Typography
-            variant="body1"
-            sx={{
-              color: '#36a9e4',
-              fontSize: '1.1rem'
-            }}
-          >
-            Submit your application and let's get started!
-          </Typography>
-          <Divider sx={{ mt: 2, backgroundColor: 'rgba(54, 169, 228, 0.2)' }} />
+        <Box sx={{ textAlign: 'left', mb: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+            <Tooltip title="Go back">
+              <IconButton
+                onClick={() => navigate(-1)}
+                sx={{
+                  color: '#36a9e4',
+                  m: 2,
+                  '&:hover': {
+                    backgroundColor: 'rgba(54, 169, 228, 0.1)',
+                  },
+                }}
+              >
+                <ArrowBack />
+              </IconButton>
+            </Tooltip>
+            <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography
+                variant="h5"
+                component="h1"
+                sx={{
+                  color: '#00254e',
+                  fontWeight: 700,
+                  mb: 1
+                }}
+              >
+                Apply for Position
+              </Typography>
+              <Typography
+                variant="body1"
+                sx={{
+                  color: '#36a9e4',
+                  fontSize: '1.1rem'
+                }}
+              >
+                Submit your application and let's get started!
+              </Typography>
+            </Box>
+
+          </Box>
         </Box>
+
+        <Divider sx={{ mt: 2, backgroundColor: 'rgba(54, 169, 228, 0.2)' }} />
+
 
         <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
           <Stack spacing={3}>
@@ -384,12 +306,12 @@ function ApplyJobPage() {
               </FormControl>
             </Box>
 
-            <Box sx={{ mt: 4 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <SubmitButton
                 type="submit"
                 disabled={loading}
                 startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
-                sx={{ height: 48, width: '300px' }}
+                sx={{ height: 44, width: '250px', fontSize: "15px" }}
               >
                 {loading ? 'Submitting Application...' : 'Submit Application'}
               </SubmitButton>
@@ -414,21 +336,8 @@ function ApplyJobPage() {
             </Alert>
           </Box>
         )}
-
-        <Box sx={{ mt: 4, textAlign: 'center' }}>
-          <Typography
-            variant="body2"
-            sx={{
-              color: '#36a9e4',
-              fontSize: '0.9rem'
-            }}
-          >
-            <Description sx={{ fontSize: 16, mr: 0.5, verticalAlign: 'middle' }} />
-            Accepted formats: PDF, DOC, DOCX (Max 5MB)
-          </Typography>
-        </Box>
       </StyledPaper>
-    </Container>
+    </Container >
   );
 }
 

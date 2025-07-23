@@ -25,7 +25,8 @@ import {
   Autocomplete,
   Accordion,
   AccordionSummary,
-  AccordionDetails
+  AccordionDetails,
+  useTheme
 } from '@mui/material';
 import {
   Work,
@@ -145,6 +146,7 @@ const HirerJobPost = () => {
   const { emailId } = useAuth();
 
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const [errors, setErrors] = useState<Partial<Record<keyof JobPostFormData, string>>>({});
   const [isGenerating, setIsGenerating] = useState(false);
@@ -941,8 +943,8 @@ const HirerJobPost = () => {
                   endIcon={<NavigateNext />}
                   variant="contained"
                   sx={{
-                    background: '#00254e',
-                    '&:hover': { background: '#36a9e4' },
+                    background: theme.palette.secondary.main,
+                    '&:hover': { background: theme.palette.primary.main },
                   }}
                 >
                   Next

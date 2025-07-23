@@ -8,12 +8,6 @@ Backend update
 Single Job route--->done
 
 
-1.'/posted/hirer_jobs'----->route for Hirer_jobs 
-i/p---->{
-  "emailid": "admin@hirehub.com"
-}
-
-
 2.'/particularjob/<string:job_id>'-------->route for particular job details
 
 i/p----->/particularjob/686a140aabe378174f886da2
