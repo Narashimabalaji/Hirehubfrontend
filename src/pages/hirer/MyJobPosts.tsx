@@ -124,10 +124,29 @@ const HirerJobsComponent: React.FC = () => {
                 <Grid container spacing={3}>
                     {jobs.map((job) => (
                         <Grid size={{ xs: 12, sm: 6, md: 4 }} key={job.id}>
-                            <Card elevation={3}>
-                                <CardContent>
+                            <Card
+                                elevation={3}
+                                sx={{
+                                    height: '100%',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    minHeight: 400 // Set minimum height for consistency
+                                }}
+                            >
+                                <CardContent sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column' }} >
                                     <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-                                        <Typography variant="h6" fontWeight="bold" color="secondary.main">
+                                        <Typography variant="h6"
+                                            fontWeight="bold"
+                                            color="secondary.main"
+                                            sx={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 2,
+                                                WebkitBoxOrient: 'vertical',
+                                                minHeight: '3em' // Reserve space for 2 lines
+                                            }}
+                                        >
                                             {job.title}
                                         </Typography>
                                         <Chip label={job.status} color={getStatusColor(job.status)} size="small" />
@@ -137,7 +156,13 @@ const HirerJobsComponent: React.FC = () => {
                                         <Grid size={{ xs: 6 }}>
                                             <Box display="flex" alignItems="center">
                                                 <Label fontSize="small" sx={{ color: 'primary.main', mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">
+                                                <Typography variant="body2" color="text.secondary"
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                >
                                                     {job.category}
                                                 </Typography>
                                             </Box>
@@ -145,7 +170,13 @@ const HirerJobsComponent: React.FC = () => {
                                         <Grid size={{ xs: 6 }}>
                                             <Box display="flex" alignItems="center">
                                                 <LocationPin fontSize="small" sx={{ color: 'primary.main', mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">
+                                                <Typography variant="body2" color="text.secondary"
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                >
                                                     {job.location}
                                                 </Typography>
                                             </Box>
@@ -154,7 +185,13 @@ const HirerJobsComponent: React.FC = () => {
                                         <Grid size={{ xs: 6 }}>
                                             <Box display="flex" alignItems="center">
                                                 <Typography fontSize="medium" sx={{ color: 'primary.main', mr: 1 }}> ₹</Typography>
-                                                <Typography variant="body2" color="text.secondary">
+                                                <Typography variant="body2" color="text.secondary"
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                >
                                                     {job.salary}
                                                 </Typography>
                                             </Box>
@@ -162,7 +199,13 @@ const HirerJobsComponent: React.FC = () => {
                                         <Grid size={{ xs: 6 }}>
                                             <Box display="flex" alignItems="center">
                                                 <School fontSize="small" sx={{ color: 'primary.main', mr: 1 }} />
-                                                <Typography variant="body2" color="text.secondary">
+                                                <Typography variant="body2" color="text.secondary"
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                >
                                                     {job.qualification}
                                                 </Typography>
                                             </Box>
@@ -170,7 +213,16 @@ const HirerJobsComponent: React.FC = () => {
                                     </Grid>
 
                                     <Box mt={2}>
-                                        <Typography variant="body2" color="text.secondary" sx={{ overflow: 'hidden', textOverflow: 'ellipsis', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' }}>
+                                        <Typography variant="body2" color="text.secondary"
+                                            sx={{
+                                                overflow: 'hidden',
+                                                textOverflow: 'ellipsis',
+                                                display: '-webkit-box',
+                                                WebkitLineClamp: 3,
+                                                WebkitBoxOrient: 'vertical',
+                                                lineHeight: 1.5
+                                            }}
+                                        >
                                             {job.description}
                                         </Typography>
                                     </Box>
@@ -179,8 +231,13 @@ const HirerJobsComponent: React.FC = () => {
                                         <Typography variant="caption" color="text.secondary" gutterBottom>
                                             Keywords:
                                         </Typography>
-                                        <Box display="flex" flexWrap="wrap" gap={0.5}>
-                                            {job.keywords.map((keyword, index) => (
+                                        <Box display="flex" flexWrap="wrap" gap={0.5}
+                                            sx={{
+                                                maxHeight: '60px',
+                                                overflow: 'hidden'
+                                            }}
+                                        >
+                                            {job.keywords.slice(0, 6).map((keyword, index) => (
                                                 <Chip
                                                     key={index}
                                                     label={keyword.trim()}
@@ -189,8 +246,18 @@ const HirerJobsComponent: React.FC = () => {
                                                     sx={{ color: 'primary.main', borderColor: 'primary.main' }}
                                                 />
                                             ))}
+                                            {job.keywords.length > 6 && (
+                                                <Chip
+                                                    label={`+${job.keywords.length - 6}`}
+                                                    size="small"
+                                                    variant="outlined"
+                                                    sx={{ color: 'text.secondary', borderColor: 'text.secondary' }}
+                                                />
+                                            )}
                                         </Box>
                                     </Box>
+
+                                    <Box sx={{ flexGrow: 1 }} />
 
                                     <Divider sx={{ my: 2 }} />
 
@@ -201,21 +268,21 @@ const HirerJobsComponent: React.FC = () => {
                                         </Box>
 
                                         <Box>
-                                            <Tooltip title="View Details">
+                                            {/* <Tooltip title="View Details">
                                                 <IconButton>
                                                     <Visibility sx={{ color: 'primary.main' }} fontSize="small" />
                                                 </IconButton>
-                                            </Tooltip>
+                                            </Tooltip>*/}
                                             <Tooltip title="Edit Job">
                                                 <IconButton>
                                                     <Edit sx={{ color: 'primary.main' }} fontSize="small" />
                                                 </IconButton>
                                             </Tooltip>
-                                            <Tooltip title="Delete Job">
+                                            {/* <Tooltip title="Delete Job">
                                                 <IconButton>
                                                     <Delete sx={{ color: 'error.main' }} fontSize="small" />
                                                 </IconButton>
-                                            </Tooltip>
+                                            </Tooltip>*/}
                                         </Box>
                                     </Box>
                                 </CardContent>

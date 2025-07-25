@@ -10,6 +10,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 import HirerJobPosts from './pages/hirer/MyJobPosts'
 import JobDetailView from './pages/JobDetail/JobDetail';
+import SavedJobs from './pages/SavedJob';
 
 
 const App = () => {
@@ -28,6 +29,7 @@ const App = () => {
           <Route path='/job/:jobId' element={<JobDetailView />} />
           <Route path='/job/apply/:jobId' element={<ApplyJobPage />} />
           <Route path='/my-posts' element={<HirerJobPosts />} />
+          <Route path='/my-jobs' element={<SavedJobs />} />
         </Route>
       </Routes>
     </Router>

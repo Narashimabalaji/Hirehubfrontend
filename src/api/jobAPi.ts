@@ -78,6 +78,10 @@ const jobAPI = {
       "job_id": jobId
     })
     return response.data;
+  },
+  fetchSavedJobs: async (emailid) => {
+    const response = await axiosInstance.get(`saved_jobs/${emailid}`)
+    return response.data;
   }
 };
 

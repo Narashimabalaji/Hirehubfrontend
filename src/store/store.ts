@@ -28,6 +28,7 @@ interface JobStore {
   filterJobs: (filters: JobFilter) => void;
   saveJob: (emailid: string, jobId: string) => void;
   removeSavedJob: (emailid: string, jobId: string) => void;
+  fetchSavedJobs: (emailid: string) => Promise<void>;
 }
 
 const useStore = create<JobStore>((set, get) => ({
@@ -94,7 +95,17 @@ const useStore = create<JobStore>((set, get) => ({
     set({ savedJobs: get().savedJobs.filter((id) => id !== jobId) });
     const response = await jobAPI.removeSaveJob(emailid, jobId)
     return response
+  },
+
+  fetchSavedJobs: async (emailid) => {
+    try {
+      const response = await jobAPI.fetchSavedJobs(emailid);
+      set({ savedJobs: response });
+    } catch (error) {
+      console.error("Failed to fetch saved jobs", error);
+    }
   }
+
 }));
 
 export default useStore;
