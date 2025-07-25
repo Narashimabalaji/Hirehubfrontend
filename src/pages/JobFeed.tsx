@@ -35,9 +35,11 @@ import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import { useAuth } from '../store/auth';
 
 const JobFeed = () => {
-  const theme = useTheme();
+  const theme = useTheme()
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
+
+  const { emailId } = useAuth();
 
   // State for filters
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,10 +52,8 @@ const JobFeed = () => {
     filteredJobs,
     fetchJobs,
     filterJobs,
-    likeJob,
     saveJob,
     savedJobs,
-    likedJobs,
     jobsLoading
   } = useStore();
 
@@ -81,21 +81,12 @@ const JobFeed = () => {
   };
 
   const isJobSaved = (jobId) => savedJobs.includes(jobId);
-  const isJobLiked = (jobId) => likedJobs.includes(jobId);
 
   const toggleSaveJob = (jobId) => {
     if (isJobSaved(jobId)) {
-      useStore.getState().removeSavedJob(jobId);
+      useStore.getState().removeSavedJob(emailId, jobId);
     } else {
-      saveJob(jobId);
-    }
-  };
-
-  const toggleLikeJob = (jobId) => {
-    if (isJobLiked(jobId)) {
-      useStore.getState().removeLikedJob(jobId);
-    } else {
-      likeJob(jobId);
+      saveJob(emailId, jobId);
     }
   };
 
@@ -123,8 +114,7 @@ const JobFeed = () => {
           <Box sx={{ p: 3, position: 'sticky', top: 20, height: 'fit-content' }}>
             <Box display="flex" alignItems="center" mb={3}>
               <Filter size={20} color={"#36a9e4"} />
-              <Typography variant="h6" fontWeight="bold" ml={1} color='
-#00254e'>
+              <Typography variant="h6" fontWeight="bold" ml={1} color='#00254e'>
                 Filters
               </Typography>
             </Box>

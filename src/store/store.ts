@@ -23,14 +23,11 @@ interface JobStore {
   filteredJobs: Job[];
   jobsLoading: boolean;
   savedJobs: string[];
-  likedJobs: string[];
 
   fetchJobs: () => Promise<void>;
   filterJobs: (filters: JobFilter) => void;
-  likeJob: (jobId: string) => void;
-  removeLikedJob: (jobId: string) => void;
-  saveJob: (jobId: string) => void;
-  removeSavedJob: (jobId: string) => void;
+  saveJob: (emailid: string, jobId: string) => void;
+  removeSavedJob: (emailid: string, jobId: string) => void;
 }
 
 const useStore = create<JobStore>((set, get) => ({
@@ -38,7 +35,6 @@ const useStore = create<JobStore>((set, get) => ({
   filteredJobs: [],
   jobsLoading: false,
   savedJobs: [],
-  likedJobs: [],
 
   fetchJobs: async () => {
     set({ jobsLoading: true });
@@ -85,26 +81,19 @@ const useStore = create<JobStore>((set, get) => ({
     set({ filteredJobs: filtered });
   },
 
-  likeJob: (jobId) => {
-    const likedJobs = get().likedJobs;
-    if (!likedJobs.includes(jobId)) {
-      set({ likedJobs: [...likedJobs, jobId] });
-    }
-  },
-
-  removeLikedJob: (jobId) => {
-    set({ likedJobs: get().likedJobs.filter((id) => id !== jobId) });
-  },
-
-  saveJob: (jobId) => {
+  saveJob: async (emailid, jobId) => {
     const savedJobs = get().savedJobs;
     if (!savedJobs.includes(jobId)) {
       set({ savedJobs: [...savedJobs, jobId] });
     }
+    const response = await jobAPI.saveJob(emailid, jobId)
+    return response
   },
 
-  removeSavedJob: (jobId) => {
+  removeSavedJob: async (emailid, jobId) => {
     set({ savedJobs: get().savedJobs.filter((id) => id !== jobId) });
+    const response = await jobAPI.removeSaveJob(emailid, jobId)
+    return response
   }
 }));
 

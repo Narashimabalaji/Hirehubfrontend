@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent, FormEvent } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -34,8 +34,13 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
   padding: theme.spacing(4),
   borderRadius: theme.spacing(2),
   background: "transparent",
-  maxWidth: "60vw",
-  margin: "0 auto"
+  margin: "0 auto",
+  width: '100%',
+  maxWidth: '600px',
+  [theme.breakpoints.down('sm')]: {
+    padding: theme.spacing(2),
+    borderRadius: theme.spacing(1),
+  },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -92,8 +97,10 @@ const SubmitButton = styled(Button)(({ theme }) => ({
   },
 }));
 
+type AlertSeverity = 'success' | 'info' | 'warning' | 'error' | undefined;
+
 function ApplyJobPage() {
-  const { jobId } = useParams();
+  const { jobId } = useParams<{ jobId: string }>();
   const navigate = useNavigate();
 
   const [name, setName] = useState('');
@@ -101,9 +108,9 @@ function ApplyJobPage() {
   const [resumeFile, setResumeFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [messageType, setMessageType] = useState<AlertSeverity>(undefined);
 
-  const handleFileChange = (e) => {
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files[0];
     if (file) {
       const allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
@@ -125,7 +132,7 @@ function ApplyJobPage() {
     }
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!name || !email || !resumeFile) {
@@ -144,7 +151,7 @@ function ApplyJobPage() {
       // Simulate loading time
       // await new Promise(resolve => setTimeout(resolve, 2000));
 
-      const data = await jobAPI.uploadResumeAPI(jobId, { name, email, resumeFile });
+      const data = await jobAPI.uploadResume(jobId, { name, email, resumeFile });
 
       setMessage('Application submitted successfully!');
       setMessageType('success');
@@ -165,7 +172,7 @@ function ApplyJobPage() {
   };
 
   return (
-    <Container maxWidth="xl" sx={{ position: "relative", px: 3 }}>
+    <Container maxWidth="xl" sx={{ px: { xs: 1, sm: 3 }, py: { xs: 2, sm: 4 } }}>
       {/* Back Button - Positioned absolutely to the left */}
       <StyledPaper elevation={0}>
         <Box sx={{ textAlign: 'left', mb: 4 }}>
@@ -175,7 +182,7 @@ function ApplyJobPage() {
                 onClick={() => navigate(-1)}
                 sx={{
                   color: '#36a9e4',
-                  m: 2,
+                  m: { xs: 1, sm: 2 },
                   '&:hover': {
                     backgroundColor: 'rgba(54, 169, 228, 0.1)',
                   },
@@ -186,12 +193,13 @@ function ApplyJobPage() {
             </Tooltip>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <Typography
-                variant="h5"
+                variant="h6"
                 component="h1"
                 sx={{
                   color: '#00254e',
                   fontWeight: 700,
-                  mb: 1
+                  mb: 1,
+                  fontSize: { xs: '1.25rem', sm: '1.5rem', md: '1.75rem' }
                 }}
               >
                 Apply for Position
@@ -269,7 +277,6 @@ function ApplyJobPage() {
                   <label htmlFor="resume-upload">
                     <UploadButton
                       variant="outlined"
-                      component="span"
                       fullWidth
                       startIcon={<CloudUpload />}
                       sx={{
@@ -309,12 +316,18 @@ function ApplyJobPage() {
             <Box sx={{ display: 'flex', justifyContent: 'center' }}>
               <SubmitButton
                 type="submit"
+                fullWidth
                 disabled={loading}
                 startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <Send />}
-                sx={{ height: 44, width: '250px', fontSize: "15px" }}
+                sx={{
+                  height: 44,
+                  fontSize: { xs: '14px', sm: '15px' },
+                  width: { xs: '100%', sm: '250px' },
+                }}
               >
                 {loading ? 'Submitting Application...' : 'Submit Application'}
               </SubmitButton>
+
             </Box>
           </Stack>
         </Box>
